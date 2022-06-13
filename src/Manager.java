@@ -6,8 +6,32 @@ public class Manager {
     private Map<Integer, Task> taskMap = new HashMap<>();
     private Map<Integer, Epic> epicMap = new HashMap<>();
     private Map<Integer, Subtask> subtaskMap = new HashMap<>();
-    int[]  list = {1, 2, 3};
 
+    public void printAllTasks() {
+        if (taskMap.size() > 0) {
+            int counter = 1;
+            System.out.println("Задачи:");
+            for (Task task : taskMap.values()) {
+                System.out.println("\t Задача " + counter + ": " + task.title);
+                counter++;
+            }
+        }
+        if (epicMap.size() > 0) {
+            int counter = 1;
+            System.out.println("Эпики:");
+            for (Epic epic : epicMap.values()) {
+                System.out.println("\tЭпик " + counter + ": " + epic.title);
+                counter++;
+                epic.printSubtasks();
+            }
+        }
+    }
+
+    public void deleteAllTasks() {
+        taskMap.clear();
+        epicMap.clear();
+        subtaskMap.clear();
+    }
 
     public void addTask(Task task) {
         switch (task.getClass().toString()) {

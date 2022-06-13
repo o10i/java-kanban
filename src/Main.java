@@ -8,6 +8,10 @@ public class Main {
         manager.addTask(new Epic("Важный эпик 2", "Описание 2", manager.getIdCounter()));
         manager.addTask(new Subtask("Задача 1", "Описание задачи 1", manager.getIdCounter(), "Важный эпик 2"));
 
-        System.out.println(manager);
+        //manager.deleteAllTasks();
+
+        manager.printAllTasks();
+/*
+        System.out.println(manager);*/
     }
 }

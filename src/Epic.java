@@ -8,6 +8,16 @@ public class Epic extends Task {
         super(title, description, id);
     }
 
+    public void printSubtasks() {
+        if (subtasks.size() > 0) {
+            int counter = 1;
+            for (Subtask subtask : subtasks) {
+                System.out.println("\t\tПодзадача " + counter + ": " + subtask.title);
+                counter++;
+            }
+        }
+    }
+
     public void addSubtask(Subtask subtask) {
         subtasks.add(subtask);
     }
