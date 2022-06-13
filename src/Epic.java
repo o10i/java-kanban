@@ -1,35 +1,34 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Epic extends Task {
-    private List<Subtask> subtasks = new ArrayList<>();
+    private Map<Integer, Subtask> subtaskMap = new HashMap<>();
 
     public Epic(String title, String description, int id) {
         super(title, description, id);
     }
 
     public void printSubtasks() {
-        if (subtasks.size() > 0) {
-            int counter = 1;
-            for (Subtask subtask : subtasks) {
-                System.out.println("\t\tПодзадача " + counter + ": " + subtask.title);
-                counter++;
-            }
+        int counter = 1;
+        for (Subtask subtask : subtaskMap.values()) {
+            System.out.println("\t\tПодзадача " + counter + ": " + subtask.getTitle());
+            counter++;
         }
     }
 
-    public void addSubtask(Subtask subtask) {
-        subtasks.add(subtask);
+    public void addSubtask(Integer key, Subtask value) {
+        subtaskMap.put(key, value);
     }
 
-    @Override
-    public String toString() {
-        return "\nEpic{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status='" + status + '\'' +
-                ", subtasks=" + subtasks +
-                '}';
+    public Map<Integer, Subtask> getSubtaskMap() {
+        return subtaskMap;
     }
+
+    /*public void setSubtask(Integer id, Subtask subtask) {
+        for (int i = 0; i < subtasks.size(); i++) {
+            if (subtasks.get(i).getId() == id) {
+                subtasks.set(i, subtask);
+            }
+        }
+    }*/
 }
