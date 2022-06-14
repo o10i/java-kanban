@@ -8,12 +8,20 @@ public class Epic extends Task {
         super(title, description, id, status);
     }
 
-    public void printSubtasks() {
+    @Override
+    public String getStatus() {
+        determineEpicStatus();
+        return super.getStatus();
+    }
+
+    public String getSubtasks() {
+        String subtasks = "";
         int counter = 1;
         for (Subtask subtask : subtaskMap.values()) {
-            System.out.println("\t\tПодзадача " + counter + ": " + subtask.getTitle());
+            subtasks += "\n\t\t" + counter + ": " + subtask.toString();
             counter++;
         }
+        return subtasks;
     }
 
     public void addSubtask(Integer key, Subtask value) {
@@ -24,8 +32,7 @@ public class Epic extends Task {
         return subtaskMap;
     }
 
-    @Override
-    public String getStatus() {
+    public void determineEpicStatus() {
         int statusDeterminant = 0;
         for (Subtask subtask : subtaskMap.values()) {
             switch (subtask.getStatus()) {
@@ -41,8 +48,15 @@ public class Epic extends Task {
                 }
             }
         }
-        if (statusDeterminant == 0 || subtaskMap.size() == 0) return NEW;
-        if (statusDeterminant == 2 * subtaskMap.size()) return DONE;
-        return IN_PROGRESS;
+        if (statusDeterminant == 0 || subtaskMap.size() == 0) status = NEW;
+        else if (statusDeterminant == 2 * subtaskMap.size()) status = DONE;
+        else status = IN_PROGRESS;
+    }
+
+    @Override
+    public String toString() {
+        determineEpicStatus();
+        return "Epic{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id +
+               ", status='" + status + '\'' + '}' + getSubtasks();
     }
 }

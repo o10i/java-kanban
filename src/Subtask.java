@@ -9,4 +9,10 @@ public class Subtask extends Task {
     public Epic getParentEpic() {
         return parentEpic;
     }
+
+    @Override
+    public String toString() {
+        return "Subtask{" + "parentEpic='" + parentEpic.getTitle() + '\'' + ", title='" + title + '\'' +
+               ", description='" + description + '\'' + ", id=" + id + ", status='" + status + '\'' + '}';
+    }
 }

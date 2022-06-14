@@ -2,28 +2,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Manager {
-    private int idCounter = 1;
-    private Map<Integer, Task> taskMap = new HashMap<>();
-    private Map<Integer, Epic> epicMap = new HashMap<>();
+    private int idCounter;
+    private Map<Integer, Task> taskMap;
+    private Map<Integer, Epic> epicMap;
 
-    public void printAllTasks() {
+    public Manager() {
+        this.idCounter = 1;
+        this.taskMap = new HashMap<>();
+        this.epicMap = new HashMap<>();
+    }
+
+    public String getAllTasks() {
+        String allTasks = "";
         if (taskMap.size() > 0) {
             int counter = 1;
-            System.out.println("Задачи:");
+            allTasks += "Задачи:\n";
             for (Task task : taskMap.values()) {
-                System.out.println("\t Задача " + counter + ": " + task.getTitle());
+                allTasks += "\t" + counter + ": " + task.toString() + "\n";
                 counter++;
             }
         }
         if (epicMap.size() > 0) {
             int counter = 1;
-            System.out.println("Эпики:");
+            allTasks += "Эпики:\n";
             for (Epic epic : epicMap.values()) {
-                System.out.println("\tЭпик " + counter + ": " + epic.getTitle());
+                allTasks += "\t" + counter + ": " + epic.toString() + "\n";
                 counter++;
-                epic.printSubtasks();
             }
         }
+        return allTasks;
     }
 
     public void deleteAllTasks() {
@@ -89,9 +96,8 @@ public class Manager {
         }
     }
 
-    public void printEpicSubtasks(Epic epic) {
-        System.out.println("Подзадачи эпика '" + epic.getTitle() + "':");
-        epic.printSubtasks();
+    public String getEpicSubtasks(Epic epic) {
+        return "Подзадачи эпика '" + epic.getTitle() + "':" + epic.getSubtasks();
     }
 
     public String getStatus(Integer id) {
@@ -108,5 +114,9 @@ public class Manager {
             }
         }
         return null;
+    }
+
+    public void setStatus(Integer id, String status) {
+        getTask(id).setStatus(status);
     }
 }
