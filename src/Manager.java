@@ -59,10 +59,8 @@ public class Manager {
         idCounter++;
     }
 
-    /*public void deleteTask(Integer id) {
-        taskMap.remove(id);
-        epicMap.remove(id);
-        //subtaskMap.remove(id);
+    public int getIdCounter() {
+        return idCounter;
     }
 
     public void updateTask(Task task) {
@@ -74,17 +72,41 @@ public class Manager {
                 epicMap.put(task.getId(), (Epic) task);
                 break;
             case "class Subtask":
-                //subtaskMap.put(task.getId(), (Subtask) task);
-                for (Integer integer : epicMap.keySet()) {
-                    if (epicMap.get(integer).getTitle().equals(((Subtask) task).getParentEpic())) {
-                        epicMap.get(integer).setSubtask(task.getId(), (Subtask) task);
+                for (Integer key : epicMap.keySet()) {
+                    if (epicMap.get(key) == ((Subtask) task).getParentEpic()) {
+                        epicMap.get(key).getSubtaskMap().put(task.getId(), (Subtask) task);
                     }
                 }
                 break;
         }
-    }*/
+    }
 
-    public int getIdCounter() {
-        return idCounter;
+    public void deleteTask(Integer id) {
+        taskMap.remove(id);
+        epicMap.remove(id);
+        for (Epic epic : epicMap.values()) {
+            epic.getSubtaskMap().remove(id);
+        }
+    }
+
+    public void printEpicSubtasks(Epic epic) {
+        System.out.println("Подзадачи эпика '" + epic.getTitle() + "':");
+        epic.printSubtasks();
+    }
+
+    public String getStatus(Integer id) {
+        if (taskMap.containsKey(id)) {
+
+            return taskMap.get(id).getStatus();
+        }
+        if (epicMap.containsKey(id)) {
+            return epicMap.get(id).getStatus();
+        }
+        for (Epic epic : epicMap.values()) {
+            if (epic.getSubtaskMap().containsKey(id)) {
+                return epic.getSubtaskMap().get(id).getStatus();
+            }
+        }
+        return null;
     }
 }
