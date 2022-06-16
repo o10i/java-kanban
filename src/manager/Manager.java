@@ -83,7 +83,7 @@ public class Manager {
                     epicMap.get(key).addSubtask(id, (Subtask) task);
                 }
             }
-        } else taskMap.put(task.getId(), task);
+        } else taskMap.put(id, task);
     }
 
     public void deleteTask(Integer id) {
