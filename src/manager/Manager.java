@@ -13,9 +13,9 @@ public class Manager {
     private int idCounter;
 
     public Manager() {
-        this.idCounter = 1;
-        this.taskMap = new HashMap<>();
-        this.epicMap = new HashMap<>();
+        idCounter = 1;
+        taskMap = new HashMap<>();
+        epicMap = new HashMap<>();
     }
 
     public String getAllTasks() {
