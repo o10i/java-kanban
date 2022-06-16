@@ -72,14 +72,15 @@ public class Manager {
         return idCounter;
     }
 
-    public void updateTask(Task task) {
+    public void updateTask(Task task, int id) {
+        task.setId(id);
         task.setStatus(Task.NEW);
         if (task instanceof Epic) {
-            epicMap.put(task.getId(), (Epic) task);
+            epicMap.put(id, (Epic) task);
         } else if (task instanceof Subtask) {
             for (Integer key : epicMap.keySet()) {
                 if (key == ((Subtask) task).getParentEpicId()) {
-                    epicMap.get(key).addSubtask(task.getId(), (Subtask) task);
+                    epicMap.get(key).addSubtask(id, (Subtask) task);
                 }
             }
         } else taskMap.put(task.getId(), task);

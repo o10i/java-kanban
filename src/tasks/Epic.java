@@ -10,11 +10,6 @@ public class Epic extends Task {
         super(title, description);
     }
 
-    public Epic(String title, String description, int id) {
-        super(title, description, id);
-    }
-
-
     @Override
     public String getStatus() {
         return super.getStatus();

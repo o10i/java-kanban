@@ -39,14 +39,12 @@ public class Main {
         manager.deleteTask(1);
         manager.deleteTask(3);
 /*
-        Из ТЗ: Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
-        Сначала реализовал как ты и написал, с автоматическим присвоением Status и Id, однако из-за вышенаписанной
-        строчки понял, что для обновления нужен Id. Теперь сделал 2 конструктора на оба случая. Ниже код для проверки.
+        Ниже код для проверки обновления
 
-        Epic epic3 = new Epic("Досуг дочери", "Найти подходящую секцию", epic2.getId());
-        manager.updateTask(epic3);
-        Subtask subtask31 = new Subtask("Занятия по кексу", "Сводить, понравится ли", subtask21.getId(), epic2.getId());
-        manager.updateTask(subtask31);
+        Epic epic3 = new Epic("Досуг дочери", "Найти подходящую секцию");
+        manager.updateTask(epic3, epic2.getId());
+        Subtask subtask31 = new Subtask("Занятия по кексу", "Сводить, понравится ли", epic2.getId());
+        manager.updateTask(subtask31, subtask21.getId());
 */
         System.out.println(manager.getAllTasks());
     }

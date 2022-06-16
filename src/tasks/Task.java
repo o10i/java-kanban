@@ -14,12 +14,6 @@ public class Task {
         this.description = description;
     }
 
-    public Task(String title, String description, int id) {
-        this.title = title;
-        this.description = description;
-        this.id = id;
-    }
-
     public String getTitle() {
         return title;
     }
