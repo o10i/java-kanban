@@ -1,17 +1,23 @@
+package tasks;
+
 public class Task {
     public static final String NEW = "NEW";
     public static final String IN_PROGRESS = "IN_PROGRESS";
     public static final String DONE = "DONE";
-    protected String title; // IDEA мне предлагает "field may be final", но ведь это не обязательно? что с этим делать, Disable inspection?
+    protected String title;
     protected String description;
     protected int id;
     protected String status;
 
-    public Task(String title, String description, int id, String status) {
+    public Task(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
+
+    public Task(String title, String description, int id) {
         this.title = title;
         this.description = description;
         this.id = id;
-        this.status = status;
     }
 
     public String getTitle() {
@@ -26,6 +32,10 @@ public class Task {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -37,6 +47,6 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id +
-               ", status='" + status + '\'' + '}';
+                ", status='" + status + '\'' + '}';
     }
 }

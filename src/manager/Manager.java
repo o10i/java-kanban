@@ -1,10 +1,16 @@
+package manager;
+
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Manager {
+    private final Map<Integer, Task> taskMap;
+    private final Map<Integer, Epic> epicMap;
     private int idCounter;
-    private Map<Integer, Task> taskMap;
-    private Map<Integer, Epic> epicMap;
 
     public Manager() {
         this.idCounter = 1;
@@ -48,21 +54,17 @@ public class Manager {
     }
 
     public void addTask(Task task) {
-        switch (task.getClass().toString()) {
-            case "class Task":
-                taskMap.put(idCounter, task);
-                break;
-            case "class Epic":
-                epicMap.put(idCounter, (Epic) task);
-                break;
-            case "class Subtask":
-                for (Integer key : epicMap.keySet()) {
-                    if (epicMap.get(key) == ((Subtask) task).getParentEpic()) {
-                        epicMap.get(key).addSubtask(task.getId(), (Subtask) task);
-                    }
+        task.setId(idCounter);
+        task.setStatus(Task.NEW);
+        if (task instanceof Epic) {
+            epicMap.put(idCounter, (Epic) task);
+        } else if (task instanceof Subtask) {
+            for (Integer key : epicMap.keySet()) {
+                if (key == ((Subtask) task).getParentEpicId()) {
+                    epicMap.get(key).addSubtask(task.getId(), (Subtask) task);
                 }
-                break;
-        }
+            }
+        } else taskMap.put(idCounter, task);
         idCounter++;
     }
 
@@ -71,33 +73,28 @@ public class Manager {
     }
 
     public void updateTask(Task task) {
-        switch (task.getClass().toString()) {
-            case "class Task":
-                taskMap.put(task.getId(), task);
-                break;
-            case "class Epic":
-                epicMap.put(task.getId(), (Epic) task);
-                break;
-            case "class Subtask":
-                for (Integer key : epicMap.keySet()) {
-                    if (epicMap.get(key) == ((Subtask) task).getParentEpic()) {
-                        epicMap.get(key).getSubtaskMap().put(task.getId(), (Subtask) task);
-                    }
+        task.setStatus(Task.NEW);
+        if (task instanceof Epic) {
+            epicMap.put(task.getId(), (Epic) task);
+        } else if (task instanceof Subtask) {
+            for (Integer key : epicMap.keySet()) {
+                if (key == ((Subtask) task).getParentEpicId()) {
+                    epicMap.get(key).addSubtask(task.getId(), (Subtask) task);
                 }
-                break;
-        }
+            }
+        } else taskMap.put(task.getId(), task);
     }
 
     public void deleteTask(Integer id) {
-        taskMap.remove(id);
-        epicMap.remove(id);
-        for (Epic epic : epicMap.values()) {
-            epic.getSubtaskMap().remove(id);
-        }
+        if (taskMap.remove(id) != null) taskMap.remove(id);
+        else if (epicMap.remove(id) != null) epicMap.remove(id);
+        else for (Epic epic : epicMap.values()) {
+                if (epic.getSubtaskMap().remove(id) != null) epic.getSubtaskMap().remove(id);
+            }
     }
 
-    public String getEpicSubtasks(Epic epic) {
-        return "Подзадачи эпика '" + epic.getTitle() + "':" + epic.getSubtasks();
+    public String getEpicSubtasksByEpicId(int id) {
+        return "Подзадачи эпика '" + epicMap.get(id).getTitle() + "':" + epicMap.get(id).getSubtasks();
     }
 
     public String getStatus(Integer id) {
@@ -117,6 +114,9 @@ public class Manager {
     }
 
     public void setStatus(Integer id, String status) {
-        getTask(id).setStatus(status);
+        getTask(id).setStatus(status); // у эпика метод переопределён, для него будет бездействие
+        if (getTask(id) instanceof Subtask) {
+            epicMap.get(((Subtask) getTask(id)).getParentEpicId()).determineEpicStatus();
+        }
     }
 }

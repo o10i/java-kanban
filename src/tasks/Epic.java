@@ -1,17 +1,27 @@
+package tasks;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Epic extends Task {
-    private Map<Integer, Subtask> subtaskMap = new HashMap<>();
+    private final Map<Integer, Subtask> subtaskMap = new HashMap<>();
 
-    public Epic(String title, String description, int id, String status) {
-        super(title, description, id, status);
+    public Epic(String title, String description) {
+        super(title, description);
     }
+
+    public Epic(String title, String description, int id) {
+        super(title, description, id);
+    }
+
 
     @Override
     public String getStatus() {
-        determineEpicStatus();
         return super.getStatus();
+    }
+
+    @Override
+    public void setStatus(String status) {
     }
 
     public String getSubtasks() {
@@ -57,6 +67,6 @@ public class Epic extends Task {
     public String toString() {
         determineEpicStatus();
         return "Epic{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id +
-               ", status='" + status + '\'' + '}' + getSubtasks();
+                ", status='" + status + '\'' + '}' + getSubtasks();
     }
 }
