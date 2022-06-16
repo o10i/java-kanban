@@ -37,8 +37,7 @@ public class Epic extends Task {
     public void determineEpicStatus() {
         if (subtaskMap.values().stream().allMatch(foo -> foo.getStatus().equals(NEW))) {
             status = NEW;
-        }
-        else if(subtaskMap.values().stream().allMatch(foo -> foo.getStatus().equals(DONE))) {
+        } else if (subtaskMap.values().stream().allMatch(foo -> foo.getStatus().equals(DONE))) {
             status = DONE;
         } else status = IN_PROGRESS;
     }
