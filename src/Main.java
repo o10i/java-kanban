@@ -32,20 +32,12 @@ public class Main {
         manager.setStatus(4, Task.DONE);
         manager.setStatus(5, Task.DONE);
         manager.setStatus(7, Task.IN_PROGRESS);
-        manager.setStatus(6, Task.DONE); // проверка бездействия метода у Epic
 
         System.out.println(manager.getAllTasks());
 
         manager.deleteTask(1);
         manager.deleteTask(3);
-/*
-        Ниже код для проверки обновления
 
-        Epic epic3 = new Epic("Досуг дочери", "Найти подходящую секцию");
-        manager.updateTask(epic3, epic2.getId());
-        Subtask subtask31 = new Subtask("Занятия по кексу", "Сводить, понравится ли", epic2.getId());
-        manager.updateTask(subtask31, subtask21.getId());
-*/
         System.out.println(manager.getAllTasks());
     }
 }

@@ -45,17 +45,22 @@ public class Manager {
     }
 
     public Task getTask(Integer id) {
-        if (taskMap.containsKey(id)) return taskMap.get(id);
-        if (epicMap.containsKey(id)) return epicMap.get(id);
+        if (taskMap.containsKey(id)) {
+            return taskMap.get(id);
+        }
+        if (epicMap.containsKey(id)) {
+            return epicMap.get(id);
+        }
         for (Epic epic : epicMap.values()) {
-            if (epic.getSubtaskMap().containsKey(id)) return epic.getSubtaskMap().get(id);
+            if (epic.getSubtaskMap().containsKey(id)) {
+                return epic.getSubtaskMap().get(id);
+            }
         }
         return null;
     }
 
     public void addTask(Task task) {
         task.setId(idCounter);
-        task.setStatus(Task.NEW);
         if (task instanceof Epic) {
             epicMap.put(idCounter, (Epic) task);
         } else if (task instanceof Subtask) {
@@ -74,7 +79,6 @@ public class Manager {
 
     public void updateTask(Task task, int id) {
         task.setId(id);
-        task.setStatus(Task.NEW);
         if (task instanceof Epic) {
             epicMap.put(id, (Epic) task);
         } else if (task instanceof Subtask) {
@@ -87,10 +91,14 @@ public class Manager {
     }
 
     public void deleteTask(Integer id) {
-        if (taskMap.remove(id) != null) taskMap.remove(id);
-        else if (epicMap.remove(id) != null) epicMap.remove(id);
-        else for (Epic epic : epicMap.values()) {
-                if (epic.getSubtaskMap().remove(id) != null) epic.getSubtaskMap().remove(id);
+        if (taskMap.remove(id) != null) {
+            taskMap.remove(id);
+        } else if (epicMap.remove(id) != null) {
+            epicMap.remove(id);
+        } else for (Epic epic : epicMap.values()) {
+                if (epic.getSubtaskMap().remove(id) != null) {
+                    epic.getSubtaskMap().remove(id);
+                }
             }
     }
 
@@ -114,9 +122,10 @@ public class Manager {
     }
 
     public void setStatus(Integer id, String status) {
-        getTask(id).setStatus(status); // у эпика метод переопределён, для него будет бездействие
-        if (getTask(id) instanceof Subtask) {
-            epicMap.get(((Subtask) getTask(id)).getParentEpicId()).determineEpicStatus();
+        Task task = getTask(id);
+        task.setStatus(status);
+        if (task instanceof Subtask) {
+            epicMap.get(((Subtask) task).getParentEpicId()).determineEpicStatus();
         }
     }
 }

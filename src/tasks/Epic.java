@@ -9,6 +9,7 @@ public class Epic extends Task {
     public Epic(String title, String description) {
         super(title, description);
         subtaskMap = new HashMap<>();
+        status = NEW;
     }
 
     @Override
@@ -34,24 +35,12 @@ public class Epic extends Task {
     }
 
     public void determineEpicStatus() {
-        int statusDeterminant = 0;
-        for (Subtask subtask : subtaskMap.values()) {
-            switch (subtask.getStatus()) {
-                case NEW:
-                    break;
-                case DONE: {
-                    statusDeterminant += 2;
-                    break;
-                }
-                case IN_PROGRESS: {
-                    statusDeterminant++;
-                    break;
-                }
-            }
+        if (subtaskMap.values().stream().allMatch(foo -> foo.getStatus().equals(NEW))) {
+            status = NEW;
         }
-        if (statusDeterminant == 0 || subtaskMap.size() == 0) status = NEW;
-        else if (statusDeterminant == 2 * subtaskMap.size()) status = DONE;
-        else status = IN_PROGRESS;
+        else if(subtaskMap.values().stream().allMatch(foo -> foo.getStatus().equals(DONE))) {
+            status = DONE;
+        } else status = IN_PROGRESS;
     }
 
     @Override

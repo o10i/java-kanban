@@ -12,6 +12,7 @@ public class Task {
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
+        status = NEW;
     }
 
     public String getTitle() {
