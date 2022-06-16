@@ -11,12 +11,6 @@ public class Epic extends Task {
         subtaskMap = new HashMap<>();
     }
 
-
-    @Override
-    public String getStatus() {
-        return super.getStatus();
-    }
-
     @Override
     public void setStatus(String status) {
     }
@@ -62,7 +56,6 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        determineEpicStatus();
         return "Epic{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id +
                 ", status='" + status + '\'' + '}' + getSubtasks();
     }

@@ -100,7 +100,6 @@ public class Manager {
 
     public String getStatus(Integer id) {
         if (taskMap.containsKey(id)) {
-
             return taskMap.get(id).getStatus();
         }
         if (epicMap.containsKey(id)) {
