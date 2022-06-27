@@ -1,4 +1,4 @@
-package manager;
+package managers;
 
 import tasks.Epic;
 import tasks.Status;
@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// к сожалению возникли проблемы с пониманием крайнего абзаца ТЗ, так сказать общая картина не рисуется
+// потому рефакторинг не получается, чтобы не мучаться думаю лучше сразу твои ценные советы услышать
 public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> taskMap;
     private final Map<Integer, Epic> epicMap;
@@ -59,18 +61,26 @@ public class InMemoryTaskManager implements TaskManager {
             return taskMap.get(id);
         }
         if (epicMap.containsKey(id)) {
-            lengthOfHistoryListCheck();
-            historyList.add(epicMap.get(id));
-            return epicMap.get(id);
+            return getEpic(id);
         }
         for (Epic epic : epicMap.values()) {
             if (epic.getSubtaskMap().containsKey(id)) {
-                lengthOfHistoryListCheck();
-                historyList.add(epic.getSubtaskMap().get(id));
-                return epic.getSubtaskMap().get(id);
+                return getSubtask(id, epic);
             }
         }
         return null;
+    }
+
+    private Task getEpic(Integer id) {
+        lengthOfHistoryListCheck();
+        historyList.add(epicMap.get(id));
+        return epicMap.get(id);
+    }
+
+    private Task getSubtask(Integer id, Epic epic) {
+        lengthOfHistoryListCheck();
+        historyList.add(epic.getSubtaskMap().get(id));
+        return epic.getSubtaskMap().get(id);
     }
 
     @Override
@@ -158,6 +168,17 @@ public class InMemoryTaskManager implements TaskManager {
     public void lengthOfHistoryListCheck() {
         if (historyList.size() == 10) {
             historyList.remove(0);
+        }
+    }
+
+    // сделал отдельный метод для печати истории, если печатать лист из getHistory(), то напечатается некрасиво из-за
+    // переопределённых методов toString в задачах.
+    public void printHistory() {
+        System.out.println("История просмотров:");
+        int counter = 1;
+        for (Task task : historyList) {
+            System.out.println(counter + ": " + task.getClass().getSimpleName() + "[" + task.getTitle() + " (id=" + task.getId() + ")]");
+            counter++;
         }
     }
 }

@@ -1,4 +1,4 @@
-import manager.InMemoryTaskManager;
+import managers.InMemoryTaskManager;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
@@ -36,9 +36,19 @@ public class Main {
 
         System.out.println(inMemoryTaskManager.getAllTasks());
 
-        inMemoryTaskManager.deleteTask(1);
-        inMemoryTaskManager.deleteTask(3);
+        inMemoryTaskManager.getTask(7);
+        inMemoryTaskManager.getTask(5);
+        inMemoryTaskManager.getTask(6);
+        inMemoryTaskManager.getTask(4);
+        inMemoryTaskManager.getTask(3);
+        inMemoryTaskManager.getTask(2);
+        inMemoryTaskManager.getTask(1);
+        inMemoryTaskManager.getTask(7);
+        inMemoryTaskManager.getTask(2);
+        inMemoryTaskManager.getTask(6);
+        inMemoryTaskManager.getTask(2);
+        inMemoryTaskManager.getTask(1);
 
-        System.out.println(inMemoryTaskManager.getAllTasks());
+        inMemoryTaskManager.printHistory();
     }
 }
