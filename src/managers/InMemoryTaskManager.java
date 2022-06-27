@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// к сожалению возникли проблемы с пониманием крайнего абзаца ТЗ, так сказать общая картина не рисуется
+// основная моя проблема - понимание ТЗ, особенно крайний его подпункт, так сказать общая картина не рисуется
 // потому рефакторинг не получается, чтобы не мучаться думаю лучше сразу твои ценные советы услышать
 public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> taskMap;
