@@ -9,11 +9,11 @@ public class Epic extends Task {
     public Epic(String title, String description) {
         super(title, description);
         subtaskMap = new HashMap<>();
-        status = NEW;
+        status = Status.NEW;
     }
 
     @Override
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
     }
 
     public String getSubtasks() {
@@ -35,11 +35,11 @@ public class Epic extends Task {
     }
 
     public void determineEpicStatus() {
-        if (subtaskMap.values().stream().allMatch(subtask -> subtask.getStatus().equals(NEW))) {
-            status = NEW;
-        } else if (subtaskMap.values().stream().allMatch(subtask -> subtask.getStatus().equals(DONE))) {
-            status = DONE;
-        } else status = IN_PROGRESS;
+        if (subtaskMap.values().stream().allMatch(subtask -> subtask.getStatus().equals(Status.NEW))) {
+            status = Status.NEW;
+        } else if (subtaskMap.values().stream().allMatch(subtask -> subtask.getStatus().equals(Status.DONE))) {
+            status = Status.DONE;
+        } else status = Status.IN_PROGRESS;
     }
 
     @Override
