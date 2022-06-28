@@ -2,17 +2,15 @@ package managers;
 
 import tasks.Task;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final List<Task> historyList = new ArrayList<>();
+    private final List<Task> historyList = new LinkedList<>();
 
     @Override
     public void add(Task task) {
-        if (historyList.size() == 10) {
-            historyList.remove(0);
-        }
+        checkLengthOfHistoryList();
         historyList.add(task);
     }
 
@@ -21,18 +19,9 @@ public class InMemoryHistoryManager implements HistoryManager {
         return historyList;
     }
 
-    public void lengthOfHistoryListCheck() {
+    private void checkLengthOfHistoryList() {
         if (historyList.size() == 10) {
             historyList.remove(0);
-        }
-    }
-
-    public void printHistory() {
-        System.out.println("История просмотров:");
-        int counter = 1;
-        for (Task task : historyList) {
-            System.out.println(counter + ": " + task.getClass().getSimpleName() + "[" + task.getTitle() + " (id=" + task.getId() + ")]");
-            counter++;
         }
     }
 }
