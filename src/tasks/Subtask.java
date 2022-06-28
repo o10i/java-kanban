@@ -5,8 +5,14 @@ public class Subtask extends Task {
 
     public Subtask(String title, String description, int parentEpicId) {
         super(title, description);
-        this.parentEpicId = parentEpicId;
         status = Status.NEW;
+        this.parentEpicId = parentEpicId;
+    }
+
+    public Subtask(String title, String description, int id, int parentEpicId) {
+        super(title, description, id);
+        status = Status.NEW;
+        this.parentEpicId = parentEpicId;
     }
 
     public int getParentEpicId() {
@@ -15,7 +21,12 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "Subtask{" + "parentEpicId=" + parentEpicId + ", title='" + title + '\'' + ", description='" +
-                description + '\'' + ", id=" + id + ", status='" + status + '\'' + '}';
+        return "Subtask{" +
+                "parentEpicId=" + parentEpicId +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                '}';
     }
 }

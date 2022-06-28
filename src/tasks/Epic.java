@@ -1,50 +1,43 @@
 package tasks;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
-    private final Map<Integer, Subtask> subtaskMap;
+    private final List<Integer> subtasksId;
 
     public Epic(String title, String description) {
         super(title, description);
-        subtaskMap = new HashMap<>();
         status = Status.NEW;
+        subtasksId = new ArrayList<>();
     }
 
-    @Override
-    public void setStatus(Status status) {
+    public Epic(String title, String description, int id) {
+        super(title, description, id);
+        status = Status.NEW;
+        subtasksId = new ArrayList<>();
     }
 
-    public String getSubtasks() {
-        String subtasks = "";
-        int counter = 1;
-        for (Subtask subtask : subtaskMap.values()) {
-            subtasks += "\n\t\t" + counter + ": " + subtask.toString();
-            counter++;
-        }
-        return subtasks;
+    public void addSubtaskId(Integer id) {
+        subtasksId.add(id);
     }
 
-    public void addSubtask(Integer key, Subtask value) {
-        subtaskMap.put(key, value);
+    public List<Integer> getSubtasksId() {
+        return subtasksId;
     }
 
-    public Map<Integer, Subtask> getSubtaskMap() {
-        return subtaskMap;
-    }
-
-    public void determineEpicStatus() {
-        if (subtaskMap.values().stream().allMatch(subtask -> subtask.getStatus().equals(Status.NEW))) {
-            status = Status.NEW;
-        } else if (subtaskMap.values().stream().allMatch(subtask -> subtask.getStatus().equals(Status.DONE))) {
-            status = Status.DONE;
-        } else status = Status.IN_PROGRESS;
+    public void removeSubtaskIdByObject(Object o) {
+        subtasksId.remove(o);
     }
 
     @Override
     public String toString() {
-        return "Epic{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id +
-                ", status='" + status + '\'' + '}' + getSubtasks();
+        return "Epic{" +
+                "subtasksId=" + subtasksId +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                '}';
     }
 }

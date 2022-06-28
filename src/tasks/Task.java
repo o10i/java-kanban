@@ -12,12 +12,11 @@ public class Task {
         status = Status.NEW;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
+    public Task(String title, String description, int id) {
+        this.title = title;
+        this.description = description;
+        this.id = id;
+        status = Status.NEW;
     }
 
     public int getId() {
@@ -38,7 +37,11 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id +
-                ", status='" + status + '\'' + '}';
+        return "Task{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                '}';
     }
 }
