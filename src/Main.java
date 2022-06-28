@@ -17,16 +17,16 @@ public class Main {
         taskManager.addTask(task2);
 
         Epic epic1 = new Epic("Дела на даче", "Летние работы");
-        taskManager.addTask(epic1);
+        taskManager.addEpic(epic1);
         Subtask subtask11 = new Subtask("Вишня", "Собрать вишню", epic1.getId());
-        taskManager.addTask(subtask11);
+        taskManager.addSubtask(subtask11);
         Subtask subtask12 = new Subtask("Огород", "Вспахать огород", epic1.getId());
-        taskManager.addTask(subtask12);
+        taskManager.addSubtask(subtask12);
 
         Epic epic2 = new Epic("Досуг сына", "Найти подходящую секцию");
-        taskManager.addTask(epic2);
+        taskManager.addEpic(epic2);
         Subtask subtask21 = new Subtask("Занятия по боксу", "Сводить, понравится ли", epic2.getId());
-        taskManager.addTask(subtask21);
+        taskManager.addSubtask(subtask21);
 
 //        System.out.println(inMemoryTaskManager.getAllTasks());
 

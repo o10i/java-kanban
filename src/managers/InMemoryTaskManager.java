@@ -82,13 +82,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addTask(Epic epic) {
+    public void addEpic(Epic epic) {
         epic.setId(idCounter);
         epicMap.put(idCounter++, epic);
     }
 
     @Override
-    public void addTask(Subtask subtask) {
+    public void addSubtask(Subtask subtask) {
         subtask.setId(idCounter);
         subtaskMap.put(idCounter++, subtask);
         for (Integer key : epicMap.keySet()) {
@@ -105,12 +105,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Epic epic) {
+    public void updateEpic(Epic epic) {
         epicMap.put(epic.getId(), epic);
     }
 
     @Override
-    public void updateTask(Subtask subtask) {
+    public void updateSubtask(Subtask subtask) {
         subtaskMap.put(subtask.getId(), subtask);
         determineEpicStatus(subtask.getParentEpicId());
     }

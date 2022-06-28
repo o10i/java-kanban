@@ -26,15 +26,15 @@ public interface TaskManager {
 
     void addTask(Task task);
 
-    void addTask(Epic epic);
+    void addEpic(Epic epic);
 
-    void addTask(Subtask subtask);
+    void addSubtask(Subtask subtask);
 
     void updateTask(Task task);
 
-    void updateTask(Epic epic);
+    void updateEpic(Epic epic);
 
-    void updateTask(Subtask subtask);
+    void updateSubtask(Subtask subtask);
 
     void deleteTask(Integer id);
 
