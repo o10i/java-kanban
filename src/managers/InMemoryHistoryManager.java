@@ -2,11 +2,11 @@ package managers;
 
 import tasks.Task;
 
+import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final List<Task> historyList = new LinkedList<>();
+    private final Deque<Task> historyList = new LinkedList<>();
 
     @Override
     public void add(Task task) {
@@ -15,13 +15,13 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public List<Task> getHistory() {
+    public Deque<Task> getHistory() {
         return historyList;
     }
 
     private void checkLengthOfHistoryList() {
         if (historyList.size() == 10) {
-            historyList.remove(0);
+            historyList.removeFirst();
         }
     }
 }

@@ -2,10 +2,10 @@ package managers;
 
 import tasks.Task;
 
-import java.util.List;
+import java.util.Deque;
 
 public interface HistoryManager {
     void add(Task task);
 
-    List<Task> getHistory();
+    Deque<Task> getHistory();
 }

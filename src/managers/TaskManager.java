@@ -5,6 +5,7 @@ import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.util.Deque;
 import java.util.List;
 
 public interface TaskManager {
@@ -44,5 +45,5 @@ public interface TaskManager {
 
     void setStatus(Integer id, Status status);
 
-    List<Task> getHistory();
+    Deque<Task> getHistory();
 }
