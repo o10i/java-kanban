@@ -2,7 +2,10 @@ package managers;
 
 import tasks.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final CustomLinkedList<Task> historyList = new CustomLinkedList<>();
@@ -14,7 +17,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        historyList.removeNode(id);
+        historyList.removeNode(historyList.hashMap.get(id));
     }
 
     @Override
@@ -22,28 +25,28 @@ public class InMemoryHistoryManager implements HistoryManager {
         return historyList.getTasks();
     }
 
-/*    private void checkLengthOfHistoryList() {
-        if (historyList.size() == 10) {
-            historyList.remove(0);
-        }
-    }*/
-
     static class CustomLinkedList<E> {
+        private final Map<Integer, Node<E>> hashMap = new HashMap<>();
         private Node<E> first;
         private Node<E> last;
         private int size = 0;
-        private final Map<Integer, Node<E>> hashMap = new HashMap<>();
 
         void linkLast(E e) {
+            int id = ((Task) e).getId();
+            if (hashMap.get(id) != null) {
+                removeNode(hashMap.get(id));
+            }
             final Node<E> l = last;
             final Node<E> newNode = new Node<>(l, e, null);
             last = newNode;
-            if (l == null)
+            if (l == null) {
                 first = newNode;
-            else
+            } else {
                 l.next = newNode;
+            }
             size++;
-            hashMap.put(((Task) newNode.item).getId(), newNode);
+
+            hashMap.put(id, newNode);
         }
 
         ArrayList<E> getTasks() {
@@ -54,16 +57,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             return arrayList;
         }
 
-        void removeNode(Node<E> node) {
-            for (Node<E> x = first; x != null; x = x.next) {
-                if (node.item.equals(x.item)) {
-                    unlink(x);
-                    break;
-                }
-            }
-        }
-
-        private void unlink(Node<E> x) {
+        void removeNode(Node<E> x) {
             final E element = x.item;
             final Node<E> next = x.next;
             final Node<E> prev = x.prev;

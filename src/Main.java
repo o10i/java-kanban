@@ -27,6 +27,8 @@ public class Main {
         Epic epic2 = new Epic("Досуг сына", "Найти подходящую секцию");
         taskManager.addEpic(epic2);
 
+        long start = System.nanoTime();
+
         System.out.println(taskManager.getHistory());
         taskManager.getEpic(7);
         System.out.println(taskManager.getHistory());
@@ -59,7 +61,9 @@ public class Main {
         taskManager.deleteTask(3);
         System.out.println(taskManager.getHistory());
 
-
+        long finish = System.nanoTime();
+        System.out.println();
+        System.out.println((finish - start) / 1000000 + " миллисекунд");
 
         /*        System.out.println(inMemoryTaskManager.getAllTasks());
 
