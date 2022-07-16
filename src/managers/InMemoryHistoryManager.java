@@ -31,6 +31,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         private Node<E> last;
         private int size = 0;
 
+        // единственный мой комментарий, состряпал всё так, чтобы работало :) как обычно, больше времени уходит,
+        // чтобы понять что, куда, откуда, чем всё это написать; буду ждать комментов)
         void linkLast(E e) {
             int id = ((Task) e).getId();
             if (hashMap.get(id) != null) {
