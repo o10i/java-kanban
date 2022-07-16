@@ -117,16 +117,21 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTask(Integer id) {
-        if (taskMap.remove(id) != null) {
+        if (taskMap.containsKey(id)) {
             taskMap.remove(id);
-        } else if (epicMap.remove(id) != null) {
+        } else if (epicMap.containsKey(id)) {
+            List<Integer> subtasksId = List.copyOf(epicMap.get(id).getSubtasksId());
+            for (Integer subtaskId : subtasksId) {
+                deleteTask(subtaskId);
+            }
             epicMap.remove(id);
-        } else if (subtaskMap.remove(id) != null) {
+        } else if (subtaskMap.containsKey(id)) {
             subtaskMap.remove(id);
             for (Epic epic : epicMap.values()) {
                 if (epic.getSubtasksId().contains(id)) {
                     epic.removeSubtaskIdByObject(id);
                     determineEpicStatus(epic.getId());
+                    break;
                 }
             }
         }
