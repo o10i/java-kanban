@@ -1,5 +1,7 @@
 package tasks;
 
+import java.util.Objects;
+
 public class Task {
     protected String title;
     protected String description;
@@ -36,12 +38,7 @@ public class Task {
     }
 
     @Override
-    public String toString() {
-        return "Task{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                '}';
+    public int hashCode() {
+        return Objects.hash(title, description, id, status);
     }
 }

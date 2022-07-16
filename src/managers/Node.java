@@ -1,12 +1,12 @@
 package managers;
 
 public class Node<E> {
-    public E data;
-    public Node<E> next;
-    public Node<E> prev;
+    E item;
+    Node<E> next;
+    Node<E> prev;
 
-    public Node(Node<E> prev, E data, Node<E> next) {
-        this.data = data;
+    Node(Node<E> prev, E element, Node<E> next) {
+        this.item = element;
         this.next = next;
         this.prev = prev;
     }
