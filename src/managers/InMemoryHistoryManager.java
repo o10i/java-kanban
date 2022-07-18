@@ -25,7 +25,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         return historyList.getTasks();
     }
 
-    static class CustomLinkedList<E> {
+    static class CustomLinkedList<E extends Task> {
         private final Map<Integer, Node<E>> hashMap = new HashMap<>();
         private Node<E> first;
         private Node<E> last;
@@ -34,7 +34,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         // единственный мой комментарий, состряпал всё так, чтобы работало :) как обычно, больше времени уходит,
         // чтобы понять что, куда, откуда, чем всё это написать; буду ждать комментов)
         void linkLast(E e) {
-            int id = ((Task) e).getId();
+            int id = e.getId();
             if (hashMap.get(id) != null) {
                 removeNode(hashMap.get(id));
             }
