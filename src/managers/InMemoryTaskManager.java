@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, Task> taskMap = new HashMap<>();
-    private final Map<Integer, Epic> epicMap = new HashMap<>();
-    private final Map<Integer, Subtask> subtaskMap = new HashMap<>();
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final Map<Integer, Task> taskMap = new HashMap<>();
+    protected final Map<Integer, Epic> epicMap = new HashMap<>();
+    protected final Map<Integer, Subtask> subtaskMap = new HashMap<>();
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
     private int idCounter = 1;
 
     @Override
@@ -112,7 +112,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) {
         subtaskMap.put(subtask.getId(), subtask);
-        determineEpicStatus(subtask.getParentEpicId());
+        for (Integer key : epicMap.keySet()) {
+            if (key == subtask.getParentEpicId()) {
+                if (!epicMap.get(key).getSubtasksId().contains(subtask.getId())) {
+                    epicMap.get(key).addSubtaskId(subtask.getId());
+                    determineEpicStatus(subtask.getParentEpicId());
+                }
+            }
+        }
     }
 
     @Override
@@ -186,5 +193,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
+    }
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
     }
 }

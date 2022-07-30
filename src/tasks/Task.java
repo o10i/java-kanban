@@ -19,6 +19,13 @@ public class Task {
         status = Status.NEW;
     }
 
+    public Task(int id, String title, Status status, String description) {
+        this.title = title;
+        this.description = description;
+        this.id = id;
+        this.status = status;
+    }
+
     public int getId() {
         return id;
     }
@@ -43,5 +50,13 @@ public class Task {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }
