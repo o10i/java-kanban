@@ -1,23 +1,23 @@
 package managers;
 
+import exception.ManagerSaveException;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-
-// сделал - как понял, а как понял - как уж понял :D уверен, можно куда лучше написать
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
-    String fileName;
+public class FileBackedTasksManager extends InMemoryTaskManager {
+    private final String fileName;
 
     public FileBackedTasksManager(String fileName) {
         this.fileName = fileName;
@@ -73,10 +73,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         taskManager.getTask(1);
         System.out.println(taskManager.getHistory());
 
-/*        taskManager.deleteTask(1);
+        taskManager.deleteTask(1);
         System.out.println(taskManager.getHistory());
         taskManager.deleteTask(3);
-        System.out.println(taskManager.getHistory());*/
+        System.out.println(taskManager.getHistory());
 
         long finish = System.nanoTime();
         System.out.println();
@@ -86,14 +86,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         System.out.println(taskManager.getHistory());
     }
 
+    // если нажать ctrl + alt + L, то IDEA сама ставит сначала статические методы, хоть и приватные, а потом остальные
+    // поменял местами нестатичные переопределённые публичные методы с приватными, или всё равно надо приватные статичные после публичных опускать?
     private static String historyToString(HistoryManager manager) {
         List<Task> list = manager.getHistory();
-        String history = "";
+        StringBuilder history = new StringBuilder();
         for (int i = 0; i < list.size(); i++) {
-            if (i == list.size() - 1) history += list.get(i).getId();
-            else history += list.get(i).getId() + ",";
+            if (i == list.size() - 1) {
+                history.append(list.get(i).getId());
+            } else {
+                history.append(list.get(i).getId());
+                history.append(",");
+            }
         }
-        return history;
+        return history.toString();
     }
 
     private static List<Integer> historyFromString(String value) {
@@ -106,77 +112,19 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     private static FileBackedTasksManager loadFromFile(File file) {
-        FileBackedTasksManager fbtm = new FileBackedTasksManager("history.csv");
+        FileBackedTasksManager fbtm = new FileBackedTasksManager(file.getName());
         String content;
         try {
             content = Files.readString(Path.of(file.getPath()));
         } catch (IOException e) {
-            throw new ManagerSaveException();
+            throw new ManagerSaveException(e);
         }
         String[] tasksAndHistory = content.split("\n\n");
         String[] tasks = tasksAndHistory[0].split("\n");
         String history = tasksAndHistory[1];
-        boolean isNotFirstLine = false;
-        for (String task : tasks) {
-            if (isNotFirstLine) { // пропуск первой строки
-                Task t = fbtm.fromString(task);
-                if (t instanceof Epic) fbtm.updateEpic((Epic) t); // через update, потому что через add нумерация id будет сбиваться на counter++
-                else if (t instanceof Subtask) fbtm.updateSubtask((Subtask) t);
-                else fbtm.updateTask(t);
-            } else isNotFirstLine = true;
-        }
-        List<Integer> historyList = historyFromString(history);
-        for (Integer i : historyList) {
-            fbtm.getTask(i);
-            fbtm.getEpic(i);
-            fbtm.getSubtask(i);
-        }
+        fbtm.restoreMaps(tasks);
+        fbtm.restoreHistory(tasks, history);
         return fbtm;
-    }
-
-    private void save() {
-        try (Writer fileWriter = new FileWriter(fileName)) {
-            fileWriter.write("id,type,name,status,description,epic\n");
-            for (Task task : super.getAllTasks()) {
-                fileWriter.write(toString(task) + "\n");
-            }
-            fileWriter.write("\n");
-            fileWriter.write(historyToString(super.getHistoryManager()));
-        } catch (IOException e) {
-            throw new ManagerSaveException();
-        }
-    }
-
-    private Type getType(Task task) {
-        if (task instanceof Epic) return Type.EPIC;
-        if (task instanceof Subtask) return Type.SUBTASK;
-        return Type.TASK;
-    }
-
-    private String toString(Task task) {
-        String taskToString = task.getId() + "," + getType(task) + "," + task.getTitle() + "," + task.getStatus()
-                + "," + task.getDescription() + ",";
-        if (task instanceof Subtask) taskToString += ((Subtask) task).getParentEpicId();
-        return taskToString;
-    }
-
-    private Task fromString(String value) {
-        String[] el = value.split(",");
-        Status status = null;
-        switch (el[3]) {
-            case "NEW":
-                status = Status.NEW;
-                break;
-            case "IN_PROGRESS":
-                status = Status.IN_PROGRESS;
-                break;
-            case "DONE":
-                status = Status.DONE;
-                break;
-        }
-        if (el[1].equals(Type.TASK.toString())) return new Task(Integer.parseInt(el[0]), el[2], status, el[4]);
-        if (el[1].equals(Type.EPIC.toString())) return new Epic(Integer.parseInt(el[0]), el[2], status, el[4]);
-        return new Subtask(Integer.parseInt(el[0]), el[2], status, el[4], Integer.parseInt(el[5]));
     }
 
     @Override
@@ -255,5 +203,88 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public void setStatus(Integer id, Status status) {
         super.setStatus(id, status);
         save();
+    }
+
+    private void restoreMaps(String[] tasks) {
+        for (int i = 1; i < tasks.length; i++) {
+            Task t = fromString(tasks[i]);
+            if (t instanceof Epic) {
+                addEpic((Epic) t);
+            } else if (t instanceof Subtask) {
+                addSubtask((Subtask) t);
+            } else {
+                addTask(t);
+            }
+        }
+    }
+
+    // проблема в том, что меняются id, и вместе с этим надо восстановить историю
+    // как я понимаю, старые id необходимо заменять на действуюшие, попробовал так
+    private void restoreHistory(String[] tasks, String history) {
+        List<Integer> historyList = historyFromString(history);
+        for (Integer id : historyList) {
+            for (int i = 1; i < tasks.length; i++) {
+                Task oldTask = fromString(tasks[i]);
+                for (Task newTask : getAllTasks()) {
+                    if (oldTask.getId() == id) {
+                        if (newTask.getTitle().equals(oldTask.getTitle())) {
+                            historyManager.add(newTask);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void save() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            writer.write("id,type,name,status,description,epic\n");
+            List<Task> tasks = getAllTasks();
+            tasks.sort(Comparator.comparingInt(Task::getId));
+            for (Task task : tasks) {
+                writer.write(toString(task));
+                writer.write("\n");
+            }
+            writer.write("\n");
+            writer.write(historyToString(getHistoryManager()));
+        } catch (IOException e) {
+            throw new ManagerSaveException(e);
+        }
+    }
+
+    // тут тоже добавил StringBuilder
+    private String toString(Task task) {
+        StringBuilder taskToString = new StringBuilder();
+        taskToString.append(task.getId());
+        taskToString.append(",");
+        taskToString.append(task.getType());
+        taskToString.append(",");
+        taskToString.append(task.getTitle());
+        taskToString.append(",");
+        taskToString.append(task.getStatus());
+        taskToString.append(",");
+        taskToString.append(task.getDescription());
+        taskToString.append(",");
+        if (task instanceof Subtask) {
+            taskToString.append(((Subtask) task).getParentEpicId());
+        }
+        return taskToString.toString();
+    }
+
+    private Task fromString(String value) {
+        String[] el = value.split(",");
+        int id = Integer.parseInt(el[0]);
+        Type type = Type.valueOf(el[1]);
+        String name = el[2];
+        Status status = Status.valueOf(el[3]);
+        String description = el[4];
+        if (type.equals(Type.TASK)) {
+            return new Task(id, name, status, description);
+        }
+        if (type.equals(Type.EPIC)) {
+            return new Epic(id, name, status, description);
+        }
+        int epic = Integer.parseInt(el[5]);
+        return new Subtask(id, name, status, description, epic);
     }
 }

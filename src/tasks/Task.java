@@ -1,5 +1,7 @@
 package tasks;
 
+import managers.Type;
+
 public class Task {
     protected String title;
     protected String description;
@@ -50,6 +52,9 @@ public class Task {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
+    }
+    public Type getType() {
+        return Type.TASK;
     }
 
     public String getTitle() {

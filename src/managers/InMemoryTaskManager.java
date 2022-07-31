@@ -112,14 +112,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) {
         subtaskMap.put(subtask.getId(), subtask);
-        for (Integer key : epicMap.keySet()) {
-            if (key == subtask.getParentEpicId()) {
-                if (!epicMap.get(key).getSubtasksId().contains(subtask.getId())) {
-                    epicMap.get(key).addSubtaskId(subtask.getId());
-                    determineEpicStatus(subtask.getParentEpicId());
-                }
-            }
-        }
+        determineEpicStatus(subtask.getParentEpicId());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package tasks;
 
+import managers.Type;
+
 public class Subtask extends Task {
     private final int parentEpicId;
 
@@ -13,6 +15,11 @@ public class Subtask extends Task {
         super(title, description, id);
         status = Status.NEW;
         this.parentEpicId = parentEpicId;
+    }
+
+    @Override
+    public Type getType() {
+        return Type.SUBTASK;
     }
 
     public Subtask(int id, String title, Status status, String description, int parentEpicId) {
