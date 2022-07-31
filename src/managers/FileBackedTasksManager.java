@@ -124,6 +124,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String history = tasksAndHistory[1];
         fbtm.restoreMaps(tasks);
         fbtm.restoreHistory(tasks, history);
+        fbtm.save(); // чтобы история перезаписалась в файл, а не только таски
         return fbtm;
     }
 
