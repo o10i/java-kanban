@@ -18,6 +18,12 @@ import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
     private final String fileName;
+    private final int ID = 0;
+    private final int TYPE = 1;
+    private final int NAME = 2;
+    private final int STATUS = 3;
+    private final int DESCRIPTION = 4;
+    private final int EPIC = 5;
 
     public FileBackedTasksManager(String fileName) {
         this.fileName = fileName;
@@ -86,8 +92,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println(taskManager.getHistory());
     }
 
-    // если нажать ctrl + alt + L, то IDEA сама ставит сначала статические методы, хоть и приватные, а потом остальные
-    // поменял местами нестатичные переопределённые публичные методы с приватными, или всё равно надо приватные статичные после публичных опускать?
     private static String historyToString(HistoryManager manager) {
         List<Task> list = manager.getHistory();
         StringBuilder history = new StringBuilder();
@@ -219,11 +223,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    // проблема в том, что меняются id, и вместе с этим надо восстановить историю
-    // как я понимаю, старые id необходимо заменять на действуюшие, попробовал так
     private void restoreHistory(String[] tasks, String history) {
         List<Integer> historyList = historyFromString(history);
         for (Integer id : historyList) {
+/*            super.getTask(id);
+            super.getEpic(id);
+            super.getSubtask(id);*/
+            // Не работает такая логика, вот у меня например история просмотра двух задач это [2, 7]
+            // Восстанавливается история, их индексы становятся 1, 2 и поэтому 7-ая старая задача даже не добавляется в историю
             for (int i = 1; i < tasks.length; i++) {
                 Task oldTask = fromString(tasks[i]);
                 for (Task newTask : getAllTasks()) {
@@ -253,7 +260,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    // тут тоже добавил StringBuilder
     private String toString(Task task) {
         StringBuilder taskToString = new StringBuilder();
         taskToString.append(task.getId());
@@ -274,18 +280,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private Task fromString(String value) {
         String[] el = value.split(",");
-        int id = Integer.parseInt(el[0]);
-        Type type = Type.valueOf(el[1]);
-        String name = el[2];
-        Status status = Status.valueOf(el[3]);
-        String description = el[4];
-        if (type.equals(Type.TASK)) {
-            return new Task(id, name, status, description);
+        if (Type.valueOf(el[TYPE]).equals(Type.TASK)) {
+            return new Task(Integer.parseInt(el[ID]), el[NAME], Status.valueOf(el[STATUS]), el[DESCRIPTION]);
         }
-        if (type.equals(Type.EPIC)) {
-            return new Epic(id, name, status, description);
+        if (Type.valueOf(el[TYPE]).equals(Type.EPIC)) {
+            return new Epic(Integer.parseInt(el[ID]), el[NAME], Status.valueOf(el[STATUS]), el[DESCRIPTION]);
         }
-        int epic = Integer.parseInt(el[5]);
-        return new Subtask(id, name, status, description, epic);
+        return new Subtask(Integer.parseInt(el[ID]), el[NAME], Status.valueOf(el[STATUS]), el[DESCRIPTION], Integer.parseInt(el[EPIC]));
     }
 }
