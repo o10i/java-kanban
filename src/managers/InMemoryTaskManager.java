@@ -15,7 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Epic> epicMap = new HashMap<>();
     protected final Map<Integer, Subtask> subtaskMap = new HashMap<>();
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
-    private int idCounter = 1;
+    protected int idCounter = 1;
 
     @Override
     public List<Task> getAllTasks() {
@@ -108,11 +108,18 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic epic) {
         epicMap.put(epic.getId(), epic);
     }
-
+    // добавил тут логику
     @Override
     public void updateSubtask(Subtask subtask) {
         subtaskMap.put(subtask.getId(), subtask);
-        determineEpicStatus(subtask.getParentEpicId());
+        for (Integer key : epicMap.keySet()) {
+            if (key == subtask.getParentEpicId()) {
+                if (!epicMap.get(key).getSubtasksId().contains(subtask.getId())) {
+                    epicMap.get(key).addSubtaskId(subtask.getId());
+                    determineEpicStatus(subtask.getParentEpicId());
+                }
+            }
+        }
     }
 
     @Override

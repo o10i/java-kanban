@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -85,11 +86,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println(taskManager.getHistory());
 
         long finish = System.nanoTime();
-        System.out.println();
-        System.out.println((finish - start) / 1000000 + " миллисекунд");
+
+        System.out.println("\n" + (finish - start) / 1000000 + " миллисекунд");
 
         taskManager = loadFromFile(new File("history.csv"));
+        System.out.println("\nИстория:");
         System.out.println(taskManager.getHistory());
+
+        System.out.println("\nВсе задачи:");
+        System.out.println(taskManager.getAllTasks());
     }
 
     private static String historyToString(HistoryManager manager) {
@@ -125,10 +130,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
         String[] tasksAndHistory = content.split("\n\n");
         String[] tasks = tasksAndHistory[0].split("\n");
-        String history = tasksAndHistory[1];
         fbtm.restoreMaps(tasks);
-        fbtm.restoreHistory(tasks, history);
-        fbtm.save(); // чтобы история перезаписалась в файл, а не только таски
+        // благодаря твоему комменту по проверке истории на null понял,
+        // что необходимо следующий код добавить в условие, а вместо стримов мне Collections.max понравился :)
+        // так же, подправил метод deleteTask, если история не содержала id удаляемой таски, выскакивала ошибка
+        if (tasksAndHistory.length > 1) {
+            String history = tasksAndHistory[1];
+            fbtm.idCounter = Collections.max(historyFromString(history));
+            fbtm.restoreHistory(history);
+        }
+        fbtm.save();
         return fbtm;
     }
 
@@ -210,37 +221,26 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
+    // из-за смены на update, пришлось добавить в метод updateSubtask логику на добавление этой сабтаски в поле сабтасок эпика
     private void restoreMaps(String[] tasks) {
         for (int i = 1; i < tasks.length; i++) {
             Task t = fromString(tasks[i]);
             if (t instanceof Epic) {
-                addEpic((Epic) t);
+                updateEpic((Epic) t);
             } else if (t instanceof Subtask) {
-                addSubtask((Subtask) t);
+                updateSubtask((Subtask) t);
             } else {
-                addTask(t);
+                updateTask(t);
             }
         }
     }
 
-    private void restoreHistory(String[] tasks, String history) {
+    private void restoreHistory(String history) {
         List<Integer> historyList = historyFromString(history);
         for (Integer id : historyList) {
-/*            super.getTask(id);
+            super.getTask(id);
             super.getEpic(id);
-            super.getSubtask(id);*/
-            // Не работает такая логика, вот у меня например история просмотра двух задач это [2, 7]
-            // Восстанавливается история, их индексы становятся 1, 2 и поэтому 7-ая старая задача даже не добавляется в историю
-            for (int i = 1; i < tasks.length; i++) {
-                Task oldTask = fromString(tasks[i]);
-                for (Task newTask : getAllTasks()) {
-                    if (oldTask.getId() == id) {
-                        if (newTask.getTitle().equals(oldTask.getTitle())) {
-                            historyManager.add(newTask);
-                        }
-                    }
-                }
-            }
+            super.getSubtask(id);
         }
     }
 
