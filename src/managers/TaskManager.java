@@ -45,4 +45,6 @@ public interface TaskManager {
     void setStatus(Integer id, Status status);
 
     List<Task> getHistory();
+
+    int getIdCounter();
 }

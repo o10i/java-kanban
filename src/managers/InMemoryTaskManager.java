@@ -108,6 +108,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic epic) {
         epicMap.put(epic.getId(), epic);
     }
+
     // добавил тут логику
     @Override
     public void updateSubtask(Subtask subtask) {
@@ -197,5 +198,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     public HistoryManager getHistoryManager() {
         return historyManager;
+    }
+
+    public int getIdCounter() {
+        return idCounter;
     }
 }

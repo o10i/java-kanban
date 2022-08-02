@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -80,14 +79,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         taskManager.getTask(1);
         System.out.println(taskManager.getHistory());
 
-        taskManager.deleteTask(1);
+/*        taskManager.deleteTask(1);
         System.out.println(taskManager.getHistory());
         taskManager.deleteTask(3);
         System.out.println(taskManager.getHistory());
-
-        long finish = System.nanoTime();
-
-        System.out.println("\n" + (finish - start) / 1000000 + " миллисекунд");
+        taskManager.deleteTask(7);
+        taskManager.deleteTask(2);*/
 
         taskManager = loadFromFile(new File("history.csv"));
         System.out.println("\nИстория:");
@@ -95,6 +92,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         System.out.println("\nВсе задачи:");
         System.out.println(taskManager.getAllTasks());
+
+        System.out.println("\nidCounter:\n" + taskManager.getIdCounter());
+
+        long finish = System.nanoTime();
+        System.out.println("\n" + (finish - start) / 1000000 + " миллисекунд");
     }
 
     private static String historyToString(HistoryManager manager) {
@@ -131,12 +133,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String[] tasksAndHistory = content.split("\n\n");
         String[] tasks = tasksAndHistory[0].split("\n");
         fbtm.restoreMaps(tasks);
-        // благодаря твоему комменту по проверке истории на null понял,
-        // что необходимо следующий код добавить в условие, а вместо стримов мне Collections.max понравился :)
+        // благодаря твоему комменту по проверке истории на null понял, что необходимо следующий код добавить в условие
+        // только count надо приравнивать к максимальной из существующих тасок, которой может и не быть в истории
+        // только тут уже будут Таски, с ходу не получилось реализовать через стрим
         // так же, подправил метод deleteTask, если история не содержала id удаляемой таски, выскакивала ошибка
+        for (Task task : fbtm.getAllTasks()) {
+            if (task.getId() > fbtm.idCounter) {
+                fbtm.idCounter = task.getId();
+            }
+        }
         if (tasksAndHistory.length > 1) {
             String history = tasksAndHistory[1];
-            fbtm.idCounter = Collections.max(historyFromString(history));
             fbtm.restoreHistory(history);
         }
         fbtm.save();
