@@ -145,15 +145,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String[] tasksAndHistory = content.split("\n\n");
         String[] tasks = tasksAndHistory[0].split("\n");
         fbtm.restoreMaps(tasks);
-        for (Task task : fbtm.getAllTasks()) {
-            if (task.getId() > fbtm.idCounter) {
-                // спасибо за стрим, мне не хватало .map(Task::getId) для решения)
-                // однако вот понял, что этот id ещё необходимо увеличить на единицу, а то при добавлении следующего
-                // элемента задача с максимальным id перезапишется или их будет 2
-                // как добавить в стриме единицу нагуглить не удалось
-                fbtm.idCounter = task.getId() + 1;
-            }
-        }
+        fbtm.idCounter = fbtm.getAllTasks().stream().map(Task::getId).max(Integer::compareTo).orElse(0) + 1;
         if (tasksAndHistory.length > 1) {
             String history = tasksAndHistory[1];
             fbtm.restoreHistory(history);
