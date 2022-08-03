@@ -93,7 +93,19 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println("\nВсе задачи:");
         System.out.println(taskManager.getAllTasks());
 
-        System.out.println("\nidCounter:\n" + taskManager.getIdCounter());
+        System.out.println("\nidCounter: " + taskManager.getIdCounter());
+        Epic epic3 = new Epic("Проверка id = 8", "Проверочный эпик");
+        taskManager.addEpic(epic3);
+        System.out.println(taskManager.getAllTasks());
+
+        System.out.println("\nПроверка изменения статуса эпика(id = 3) после изменения статуса его сабтасок на DONE");
+        taskManager.setStatus(4, Status.DONE);
+        taskManager.setStatus(5, Status.DONE);
+        taskManager.setStatus(6, Status.DONE);
+        System.out.println(taskManager.getAllTasks());
+
+        taskManager.deleteTask(4);
+        System.out.println(taskManager.getAllTasks());
 
         long finish = System.nanoTime();
         System.out.println("\n" + (finish - start) / 1000000 + " миллисекунд");
@@ -133,13 +145,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String[] tasksAndHistory = content.split("\n\n");
         String[] tasks = tasksAndHistory[0].split("\n");
         fbtm.restoreMaps(tasks);
-        // благодаря твоему комменту по проверке истории на null понял, что необходимо следующий код добавить в условие
-        // только count надо приравнивать к максимальной из существующих тасок, которой может и не быть в истории
-        // только тут уже будут Таски, с ходу не получилось реализовать через стрим
-        // так же, подправил метод deleteTask, если история не содержала id удаляемой таски, выскакивала ошибка
         for (Task task : fbtm.getAllTasks()) {
             if (task.getId() > fbtm.idCounter) {
-                fbtm.idCounter = task.getId();
+                // спасибо за стрим, мне не хватало .map(Task::getId) для решения)
+                // однако вот понял, что этот id ещё необходимо увеличить на единицу, а то при добавлении следующего
+                // элемента задача с максимальным id перезапишется или их будет 2
+                // как добавить в стриме единицу нагуглить не удалось
+                fbtm.idCounter = task.getId() + 1;
             }
         }
         if (tasksAndHistory.length > 1) {
@@ -228,7 +240,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
-    // из-за смены на update, пришлось добавить в метод updateSubtask логику на добавление этой сабтаски в поле сабтасок эпика
     private void restoreMaps(String[] tasks) {
         for (int i = 1; i < tasks.length; i++) {
             Task t = fromString(tasks[i]);

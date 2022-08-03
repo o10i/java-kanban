@@ -91,12 +91,11 @@ public class InMemoryTaskManager implements TaskManager {
     public void addSubtask(Subtask subtask) {
         subtask.setId(idCounter);
         subtaskMap.put(idCounter++, subtask);
-        for (Integer key : epicMap.keySet()) {
-            if (key == subtask.getParentEpicId()) {
-                epicMap.get(key).addSubtaskId(subtask.getId());
-                determineEpicStatus(subtask.getParentEpicId());
-            }
+        Epic parentEpic = epicMap.get(subtask.getParentEpicId());
+        if (!parentEpic.getSubtasksId().contains(subtask.getId())) {
+            parentEpic.addSubtaskId(subtask.getId());
         }
+        determineEpicStatus(subtask.getParentEpicId());
     }
 
     @Override
@@ -109,18 +108,17 @@ public class InMemoryTaskManager implements TaskManager {
         epicMap.put(epic.getId(), epic);
     }
 
-    // добавил тут логику
+    // спасибки, подправил и вместе с ним метод addSubtask тоже
+    // и логику в getSubtasksByEpicId поменял, теперь быстрее
+    // так же поменял deleteTask в части сабтасок
     @Override
     public void updateSubtask(Subtask subtask) {
         subtaskMap.put(subtask.getId(), subtask);
-        for (Integer key : epicMap.keySet()) {
-            if (key == subtask.getParentEpicId()) {
-                if (!epicMap.get(key).getSubtasksId().contains(subtask.getId())) {
-                    epicMap.get(key).addSubtaskId(subtask.getId());
-                    determineEpicStatus(subtask.getParentEpicId());
-                }
-            }
+        Epic parentEpic = epicMap.get(subtask.getParentEpicId());
+        if (!parentEpic.getSubtasksId().contains(subtask.getId())) {
+            parentEpic.addSubtaskId(subtask.getId());
         }
+        determineEpicStatus(subtask.getParentEpicId());
     }
 
     @Override
@@ -134,14 +132,10 @@ public class InMemoryTaskManager implements TaskManager {
             }
             epicMap.remove(id);
         } else if (subtaskMap.containsKey(id)) {
+            Epic parentEpic = epicMap.get(subtaskMap.get(id).getParentEpicId());
+            parentEpic.removeSubtaskIdByObject(id);
             subtaskMap.remove(id);
-            for (Epic epic : epicMap.values()) {
-                if (epic.getSubtasksId().contains(id)) {
-                    epic.removeSubtaskIdByObject(id);
-                    determineEpicStatus(epic.getId());
-                    break;
-                }
-            }
+            determineEpicStatus(parentEpic.getId());
         }
         historyManager.remove(id);
     }
@@ -149,10 +143,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Subtask> getSubtasksByEpicId(int id) {
         List<Subtask> epicSubtasks = new ArrayList<>();
-        for (Subtask subtask : subtaskMap.values()) {
-            if (subtask.getParentEpicId() == id) {
-                epicSubtasks.add(subtask);
-            }
+        for (Integer subtaskId : epicMap.get(id).getSubtasksId()) {
+            epicSubtasks.add(subtaskMap.get(subtaskId));
         }
         return epicSubtasks;
     }
