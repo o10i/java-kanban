@@ -18,15 +18,6 @@ public class InMemoryTaskManager implements TaskManager {
     protected int idCounter = 1;
 
     @Override
-    public List<Task> getAllTasks() {
-        List<Task> allTasksList = new ArrayList<>();
-        allTasksList.addAll(taskMap.values());
-        allTasksList.addAll(epicMap.values());
-        allTasksList.addAll(subtaskMap.values());
-        return allTasksList;
-    }
-
-    @Override
     public List<Task> getTasks() {
         return new ArrayList<>(taskMap.values());
     }
@@ -39,6 +30,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Subtask> getSubtasks() {
         return new ArrayList<>(subtaskMap.values());
+    }
+
+    @Override
+    public List<Task> getAllTasks() {
+        List<Task> allTasksList = new ArrayList<>();
+        allTasksList.addAll(taskMap.values());
+        allTasksList.addAll(epicMap.values());
+        allTasksList.addAll(subtaskMap.values());
+        return allTasksList;
     }
 
     @Override
