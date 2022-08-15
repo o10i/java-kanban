@@ -1,5 +1,6 @@
-package managers;
+package tests;
 
+import managers.InMemoryHistoryManager;
 import org.junit.jupiter.api.Test;
 import tasks.Task;
 
