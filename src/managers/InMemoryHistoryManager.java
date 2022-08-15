@@ -33,7 +33,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         private Node<E> first;
         private Node<E> last;
         private int size = 0;
- 
+
         private void linkLast(E e) {
             int id = e.getId();
             if (hashMap.get(id) != null) {

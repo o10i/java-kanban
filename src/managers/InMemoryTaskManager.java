@@ -76,19 +76,21 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addTask(Task task) {
+    public int addTask(Task task) {
         task.setId(idCounter);
         taskMap.put(idCounter++, task);
+        return task.getId();
     }
 
     @Override
-    public void addEpic(Epic epic) {
+    public int addEpic(Epic epic) {
         epic.setId(idCounter);
         epicMap.put(idCounter++, epic);
+        return epic.getId();
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
+    public int addSubtask(Subtask subtask) {
         subtask.setId(idCounter);
         subtaskMap.put(idCounter++, subtask);
         Epic parentEpic = epicMap.get(subtask.getParentEpicId());
@@ -96,6 +98,7 @@ public class InMemoryTaskManager implements TaskManager {
             parentEpic.addSubtaskId(subtask.getId());
         }
         determineEpicStatus(subtask.getParentEpicId());
+        return subtask.getId();
     }
 
     @Override
@@ -108,9 +111,6 @@ public class InMemoryTaskManager implements TaskManager {
         epicMap.put(epic.getId(), epic);
     }
 
-    // спасибки, подправил и вместе с ним метод addSubtask тоже
-    // и логику в getSubtasksByEpicId поменял, теперь быстрее
-    // так же поменял deleteTask в части сабтасок
     @Override
     public void updateSubtask(Subtask subtask) {
         subtaskMap.put(subtask.getId(), subtask);
@@ -173,7 +173,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private void determineEpicStatus(int id) {
+    public void determineEpicStatus(int id) {
         if (getSubtasksByEpicId(id).stream().allMatch(subtask -> subtask.getStatus().equals(Status.NEW))) {
             epicMap.get(id).setStatus(Status.NEW);
         } else if (getSubtasksByEpicId(id).stream().allMatch(subtask -> subtask.getStatus().equals(Status.DONE))) {
