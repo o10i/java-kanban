@@ -134,7 +134,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return history;
     }
 
-    private static FileBackedTasksManager loadFromFile(File file) {
+    public static FileBackedTasksManager loadFromFile(File file) {
         FileBackedTasksManager fbtm = new FileBackedTasksManager(file.getName());
         String content;
         try {
@@ -265,7 +265,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private void save() {
+    public void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write("id,type,name,status,description,epic\n");
             List<Task> tasks = getAllTasks();

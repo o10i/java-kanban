@@ -1,5 +1,4 @@
 id,type,name,status,description,epic
-1,TASK,Test getTasks1,NEW,Test getTasks1 description,
-2,TASK,Test getTasks2,NEW,Test getTasks2 description,
-3,TASK,Test getTasks3,NEW,Test getTasks3 description,
+1,EPIC,Test saveOnlyEpicFile,NEW,Test saveOnlyEpicFile description,
 
+1
