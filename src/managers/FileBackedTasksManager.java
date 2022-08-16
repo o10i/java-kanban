@@ -79,11 +79,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         taskManager.getTask(1);
         System.out.println(taskManager.getHistory());
 
-/*        taskManager.deleteTask(1);
+        taskManager.deleteTask(1);
         System.out.println(taskManager.getHistory());
         taskManager.deleteTask(3);
         System.out.println(taskManager.getHistory());
-        taskManager.deleteTask(7);
+        /*taskManager.deleteTask(7);
         taskManager.deleteTask(2);*/
 
         taskManager = loadFromFile(new File("history.csv"));
@@ -94,11 +94,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println(taskManager.getAllTasks());
 
         System.out.println("\nidCounter: " + taskManager.getIdCounter());
-        Epic epic3 = new Epic("Проверка id = 8", "Проверочный эпик");
+        Epic epic3 = new Epic("Проверка id=8", "Проверочный эпик");
         taskManager.addEpic(epic3);
         System.out.println(taskManager.getAllTasks());
 
-        System.out.println("\nПроверка изменения статуса эпика(id = 3) после изменения статуса его сабтасок на DONE");
+        System.out.println("\nПроверка изменения статуса эпика(id=3) после изменения статуса его сабтасок на DONE");
         taskManager.setStatus(4, Status.DONE);
         taskManager.setStatus(5, Status.DONE);
         taskManager.setStatus(6, Status.DONE);
