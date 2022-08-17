@@ -2,7 +2,6 @@ package tasks;
 
 import managers.Type;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Subtask extends Task {
@@ -28,22 +27,22 @@ public class Subtask extends Task {
         this.parentEpicId = parentEpicId;
     }
 
-    public Subtask(String title, String description, Duration duration, LocalDateTime startTime, int parentEpicId) {
+    public Subtask(String title, String description, long duration, LocalDateTime startTime, int parentEpicId) {
         super(title, description, duration, startTime);
         this.parentEpicId = parentEpicId;
     }
 
-    public Subtask(String title, String description, int id, Duration duration, LocalDateTime startTime, int parentEpicId) {
+    public Subtask(String title, String description, int id, long duration, LocalDateTime startTime, int parentEpicId) {
         super(title, description, id, duration, startTime);
         this.parentEpicId = parentEpicId;
     }
 
-    public Subtask(int id, String title, Status status, String description, Duration duration, LocalDateTime startTime, int parentEpicId) {
+    public Subtask(int id, String title, Status status, String description, long duration, LocalDateTime startTime, int parentEpicId) {
         super(id, title, status, description, duration, startTime);
         this.parentEpicId = parentEpicId;
     }
 
-    public Subtask(String title, String description, Status status, Duration duration, LocalDateTime startTime, int parentEpicId) {
+    public Subtask(String title, String description, Status status, long duration, LocalDateTime startTime, int parentEpicId) {
         super(title, description, status, duration, startTime);
         this.parentEpicId = parentEpicId;
     }

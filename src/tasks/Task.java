@@ -40,37 +40,37 @@ public class Task {
         this.status = status;
     }
 
-    public Task(String title, String description, Duration duration, LocalDateTime startTime) {
+    public Task(String title, String description, long duration, LocalDateTime startTime) {
         this.title = title;
         this.description = description;
-        this.duration = duration;
+        this.duration = Duration.ofMinutes(duration);
         this.startTime = startTime;
         status = Status.NEW;
     }
 
-    public Task(String title, String description, int id, Duration duration, LocalDateTime startTime) {
+    public Task(String title, String description, int id, long duration, LocalDateTime startTime) {
         this.title = title;
         this.description = description;
         this.id = id;
-        this.duration = duration;
+        this.duration = Duration.ofMinutes(duration);
         this.startTime = startTime;
         status = Status.NEW;
     }
 
-    public Task(int id, String title, Status status, String description, Duration duration, LocalDateTime startTime) {
+    public Task(int id, String title, Status status, String description, long duration, LocalDateTime startTime) {
         this.title = title;
         this.description = description;
         this.id = id;
         this.status = status;
-        this.duration = duration;
+        this.duration = Duration.ofMinutes(duration);
         this.startTime = startTime;
     }
 
-    public Task(String title, String description, Status status, Duration duration, LocalDateTime startTime) {
+    public Task(String title, String description, Status status, long duration, LocalDateTime startTime) {
         this.title = title;
         this.description = description;
         this.status = status;
-        this.duration = duration;
+        this.duration = Duration.ofMinutes(duration);
         this.startTime = startTime;
     }
 
