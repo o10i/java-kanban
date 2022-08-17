@@ -96,6 +96,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic parentEpic = epicMap.get(subtask.getParentEpicId());
         if (!parentEpic.getSubtasksId().contains(subtask.getId())) {
             parentEpic.addSubtaskId(subtask.getId());
+            parentEpic.addSubtaskDuration(subtask.getDuration());
         }
         determineEpicStatus(subtask.getParentEpicId());
         return subtask.getId();
@@ -117,6 +118,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic parentEpic = epicMap.get(subtask.getParentEpicId());
         if (!parentEpic.getSubtasksId().contains(subtask.getId())) {
             parentEpic.addSubtaskId(subtask.getId());
+            parentEpic.addSubtaskDuration(subtask.getDuration());
         }
         determineEpicStatus(subtask.getParentEpicId());
     }
@@ -134,6 +136,7 @@ public class InMemoryTaskManager implements TaskManager {
         } else if (subtaskMap.containsKey(id)) {
             Epic parentEpic = epicMap.get(subtaskMap.get(id).getParentEpicId());
             parentEpic.removeSubtaskIdByObject(id);
+            parentEpic.removeSubtaskDuration(subtaskMap.get(id).getDuration());
             subtaskMap.remove(id);
             determineEpicStatus(parentEpic.getId());
         }

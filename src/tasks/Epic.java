@@ -2,24 +2,45 @@ package tasks;
 
 import managers.Type;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private final List<Integer> subtasksId = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(String title, String description) {
         super(title, description);
-        status = Status.NEW;
     }
 
     public Epic(String title, String description, int id) {
         super(title, description, id);
-        status = Status.NEW;
     }
 
     public Epic(int id, String title, Status status, String description) {
         super(id, title, status, description);
+    }
+
+    public Epic(String title, String description, Status status) {
+        super(title, description, status);
+    }
+
+    public Epic(String title, String description, Duration duration, LocalDateTime startTime) {
+        super(title, description, duration, startTime);
+    }
+
+    public Epic(String title, String description, int id, Duration duration, LocalDateTime startTime) {
+        super(title, description, id, duration, startTime);
+    }
+
+    public Epic(int id, String title, Status status, String description, Duration duration, LocalDateTime startTime) {
+        super(id, title, status, description, duration, startTime);
+    }
+
+    public Epic(String title, String description, Status status, Duration duration, LocalDateTime startTime) {
+        super(title, description, status, duration, startTime);
     }
 
     @Override
@@ -27,8 +48,13 @@ public class Epic extends Task {
         return Type.EPIC;
     }
 
+
     public void addSubtaskId(Integer id) {
         subtasksId.add(id);
+    }
+
+    public void addSubtaskDuration(Duration duration) {
+        this.duration = this.duration.plus(duration);
     }
 
     public List<Integer> getSubtasksId() {
@@ -39,6 +65,9 @@ public class Epic extends Task {
         subtasksId.remove(o);
     }
 
+    public void removeSubtaskDuration(Duration duration) {
+        this.duration = this.duration.minus(duration);
+    }
     @Override
     public String toString() {
         return "Epic{" +

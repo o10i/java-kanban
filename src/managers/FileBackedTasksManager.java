@@ -207,6 +207,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Epic parentEpic = epicMap.get(subtask.getParentEpicId());
         if (!parentEpic.getSubtasksId().contains(subtask.getId())) {
             parentEpic.addSubtaskId(subtask.getId());
+            parentEpic.addSubtaskDuration(subtask.getDuration());
         }
         determineEpicStatus(subtask.getParentEpicId());
         save();

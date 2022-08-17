@@ -2,6 +2,8 @@ package tasks;
 
 import managers.Type;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -9,6 +11,8 @@ public class Task {
     protected String description;
     protected int id;
     protected Status status;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
     public Task(String title, String description) {
         this.title = title;
@@ -36,6 +40,40 @@ public class Task {
         this.status = status;
     }
 
+    public Task(String title, String description, Duration duration, LocalDateTime startTime) {
+        this.title = title;
+        this.description = description;
+        this.duration = duration;
+        this.startTime = startTime;
+        status = Status.NEW;
+    }
+
+    public Task(String title, String description, int id, Duration duration, LocalDateTime startTime) {
+        this.title = title;
+        this.description = description;
+        this.id = id;
+        this.duration = duration;
+        this.startTime = startTime;
+        status = Status.NEW;
+    }
+
+    public Task(int id, String title, Status status, String description, Duration duration, LocalDateTime startTime) {
+        this.title = title;
+        this.description = description;
+        this.id = id;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Task(String title, String description, Status status, Duration duration, LocalDateTime startTime) {
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
     public int getId() {
         return id;
     }
@@ -61,6 +99,7 @@ public class Task {
                 ", status=" + status +
                 '}';
     }
+
     public Type getType() {
         return Type.TASK;
     }
@@ -84,5 +123,13 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(title, description, id, status);
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
+    public Duration getDuration() {
+        return duration;
     }
 }

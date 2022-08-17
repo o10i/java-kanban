@@ -1,4 +1,3 @@
 id,type,name,status,description,epic
-1,EPIC,Test saveOnlyEpicFile,NEW,Test saveOnlyEpicFile description,
+1,TASK,Test saveEmptyHistoryFile,NEW,Test saveEmptyHistoryFile description,
 
-1
