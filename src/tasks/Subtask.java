@@ -64,6 +64,8 @@ public class Subtask extends Task {
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", status=" + status +
+                ", duration=" + duration.getSeconds() / 60 +
+                ", startTime=" + startTime +
                 '}';
     }
 }

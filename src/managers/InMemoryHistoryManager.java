@@ -3,10 +3,7 @@ package managers;
 import managers.models.Node;
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final CustomLinkedList<Task> historyList = new CustomLinkedList<>();
@@ -26,6 +23,19 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public List<Task> getHistory() {
         return historyList.getTasks();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InMemoryHistoryManager that = (InMemoryHistoryManager) o;
+        return Objects.equals(historyList, that.historyList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(historyList);
     }
 
     private static class CustomLinkedList<E extends Task> {

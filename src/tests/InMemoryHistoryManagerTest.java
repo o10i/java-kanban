@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Task;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,7 +17,8 @@ class InMemoryHistoryManagerTest {
     @BeforeEach
     void newManager() {
         historyManager = new InMemoryHistoryManager();
-        task = new Task("Test Task", "Test Task description", 1);
+        task = new Task("Test Task", "Test Task description", 1,
+                1, LocalDateTime.of(2021, 1, 1, 0, 0));
     }
 
     @Test
@@ -31,7 +33,8 @@ class InMemoryHistoryManagerTest {
     void addDouble() {
         historyManager.add(task);
 
-        Task taskDouble = new Task("Test addDouble", "Test addDouble description", 1);
+        Task taskDouble = new Task("Test addDouble", "Test addDouble description", 1,
+                1, LocalDateTime.of(2021, 1, 1, 0, 0));
         historyManager.add(taskDouble);
 
         final List<Task> history = historyManager.getHistory();
@@ -65,9 +68,11 @@ class InMemoryHistoryManagerTest {
     void removeMiddleTask() {
         historyManager.add(task);
 
-        Task task2 = new Task("Test removeMiddleTask", "Test removeMiddleTask description", 2);
+        Task task2 = new Task("Test removeMiddleTask", "Test removeMiddleTask description", 2,
+                2, LocalDateTime.of(2022, 2, 2, 0, 0));
         historyManager.add(task2);
-        Task task3 = new Task("Test removeMiddleTask", "Test removeMiddleTask description", 3);
+        Task task3 = new Task("Test removeMiddleTask", "Test removeMiddleTask description", 3,
+                3, LocalDateTime.of(2023, 3, 3, 0, 0));
         historyManager.add(task3);
 
         final List<Task> history = historyManager.getHistory();
@@ -87,9 +92,11 @@ class InMemoryHistoryManagerTest {
     void removeLastTask() {
         historyManager.add(task);
 
-        Task task2 = new Task("Test removeLastTask", "Test removeLastTask description", 2);
+        Task task2 = new Task("Test removeLastTask", "Test removeLastTask description", 2,
+                2, LocalDateTime.of(2022, 2, 2, 0, 0));
         historyManager.add(task2);
-        Task task3 = new Task("Test removeLastTask", "Test removeLastTask description", 3);
+        Task task3 = new Task("Test removeLastTask", "Test removeLastTask description", 3,
+        3, LocalDateTime.of(2023, 3, 3, 0, 0));
         historyManager.add(task3);
 
         final List<Task> history = historyManager.getHistory();

@@ -6,6 +6,7 @@ import tasks.Subtask;
 import tasks.Task;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
     List<Task> getAllTasks();
@@ -24,11 +25,11 @@ public interface TaskManager {
 
     Subtask getSubtask(Integer id);
 
-    int addTask(Task task);
+    void addTask(Task task);
 
-    int addEpic(Epic epic);
+    void addEpic(Epic epic);
 
-    int addSubtask(Subtask subtask);
+    void addSubtask(Subtask subtask);
 
     void updateTask(Task task);
 
@@ -49,4 +50,6 @@ public interface TaskManager {
     int getIdCounter();
 
     void determineEpicStatus(int epicId);
+
+    Set<Task> getPrioritizedTasks();
 }

@@ -11,7 +11,7 @@ public class Task {
     protected String description;
     protected int id;
     protected Status status;
-    protected Duration duration;
+    protected Duration duration = Duration.ZERO;
     protected LocalDateTime startTime;
 
     public Task(String title, String description) {
@@ -57,6 +57,14 @@ public class Task {
         status = Status.NEW;
     }
 
+    public Task(int id, String title, Status status, String description, long duration) {
+        this.title = title;
+        this.description = description;
+        this.id = id;
+        this.status = status;
+        this.duration = Duration.ofMinutes(duration);
+    }
+
     public Task(int id, String title, Status status, String description, long duration, LocalDateTime startTime) {
         this.title = title;
         this.description = description;
@@ -90,16 +98,6 @@ public class Task {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "Task{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                '}';
-    }
-
     public Type getType() {
         return Type.TASK;
     }
@@ -131,5 +129,29 @@ public class Task {
 
     public Duration getDuration() {
         return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                ", duration=" + duration.getSeconds() / 60 +
+                ", startTime=" + startTime +
+                '}';
+    }
+
+    public void setDuration(long duration) {
+        this.duration = Duration.ofMinutes(duration);
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 }

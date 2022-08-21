@@ -35,6 +35,10 @@ public class Epic extends Task {
         super(title, description, id, duration, startTime);
     }
 
+    public Epic(int id, String title, Status status, String description, long duration) {
+        super(id, title, status, description, duration);
+    }
+
     public Epic(int id, String title, Status status, String description, long duration, LocalDateTime startTime) {
         super(id, title, status, description, duration, startTime);
     }
@@ -68,6 +72,7 @@ public class Epic extends Task {
     public void removeSubtaskDuration(Duration duration) {
         this.duration = this.duration.minus(duration);
     }
+
     @Override
     public String toString() {
         return "Epic{" +
@@ -76,6 +81,8 @@ public class Epic extends Task {
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", status=" + status +
+                ", duration=" + duration.getSeconds() / 60 +
+                ", startTime=" + startTime +
                 '}';
     }
 }
