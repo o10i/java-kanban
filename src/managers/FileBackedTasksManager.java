@@ -33,29 +33,34 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
+        // старт секундомер
+        long start = System.nanoTime();
+
         // создание менеджера и задач
         TaskManager taskManager = new FileBackedTasksManager("history.csv");
 
-        Task task1 = new Task("Купить автомобиль", "Для семейных целей", 30, LocalDateTime.of(2022, 8, 19, 0, 0));
+        Task task1 = new Task("Купить автомобиль", "Для семейных целей", 60, LocalDateTime.of(2022, 1, 1, 0, 0));
         taskManager.addTask(task1);
 
-        Task task2 = new Task("Продать квартиру", "Пока цена хорошая", 40, LocalDateTime.of(2022, 8, 19, 0, 30));
+        Task task2 = new Task("Продать квартиру", "Пока цена хорошая", 60, LocalDateTime.of(2022, 1, 1, 1, 0));
         taskManager.addTask(task2);
 
         Epic epic1 = new Epic("Дела на даче", "Летние работы");
         taskManager.addEpic(epic1);
-        Subtask subtask11 = new Subtask("Вишня", "Собрать вишню", 10, LocalDateTime.of(2022, 8, 21, 0, 0), epic1.getId());
+        Subtask subtask11 = new Subtask("Вишня", "Собрать вишню", 30, LocalDateTime.of(2022, 12, 31, 23, 30), epic1.getId());
         taskManager.addSubtask(subtask11);
-        Subtask subtask12 = new Subtask("Огород", "Вспахать огород", 15, LocalDateTime.of(2022, 8, 17, 0, 0), epic1.getId());
+        Subtask subtask12 = new Subtask("Огород", "Вспахать огород", 30, LocalDateTime.of(2022, 1, 1, 2, 0), epic1.getId());
         taskManager.addSubtask(subtask12);
-        Subtask subtask13 = new Subtask("Черешня", "Собрать черешню", 20, LocalDateTime.of(2022, 8, 18, 0, 0), epic1.getId());
+        Subtask subtask13 = new Subtask("Черешня", "Собрать черешню", 30, LocalDateTime.of(2022, 1, 1, 2, 30), epic1.getId());
         taskManager.addSubtask(subtask13);
 
         Epic epic2 = new Epic("Досуг сына", "Найти подходящую секцию");
         taskManager.addEpic(epic2);
 
-        Epic epic3 = new Epic("Досуг дочери", "Найти подходящего мужа");
-        taskManager.addEpic(epic3);
+        System.out.println("Список созданных задач в порядке id:");
+        for (Task task : taskManager.getAllTasksSortedById()) {
+            System.out.println(task);
+        }
 
         // создание истории просмотров
         taskManager.getEpic(7);
@@ -70,43 +75,43 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         taskManager.getSubtask(6);
         taskManager.getTask(2);
         taskManager.getTask(1);
-/*        System.out.println("Список задач");
-        System.out.println(taskManager.getAllTasks()); // 1..7
-        System.out.println("История просмотров");
-        System.out.println(taskManager.getHistory()); // 5 4 3 7 6 2 1
+        System.out.println("\nИстория просмотров (5, 4, 3, 7, 6, 2, 1):");
+        for (Task task : taskManager.getHistory()) {
+            System.out.println(task);
+        }
 
-        // удаление задач и проверка списка задач и истории просмотров
-        taskManager.deleteTask(1);
-        System.out.println("\nСписок задач (удалена id=1)");
-        System.out.println(taskManager.getAllTasks());  // 5 4 3 7 6 2 1
-        System.out.println("История просмотров (удалена id=1)");
-        System.out.println(taskManager.getHistory());
-
-        taskManager.deleteTask(3);
-        System.out.println("\nСписок задач (удалён id=3 и его подзадачи)");
-        System.out.println(taskManager.getAllTasks()); // 2 7
-        System.out.println("История просмотров (удалён id=3 и его подзадачи)");
-        System.out.println(taskManager.getHistory()); // 7 2
-
-        taskManager.deleteTask(7);
-        taskManager.deleteTask(2);
-        System.out.println("\nСписок задач (удалены все задачи)");
-        System.out.println(taskManager.getAllTasks()); // []
-        System.out.println("История просмотров (удалена вся история)");
-        System.out.println(taskManager.getHistory()); // []
+        /*// проверка полей эпика и истории просмотров после удаление подзадачи
+        taskManager.deleteTask(4);
+        System.out.println("\nПроверка изменения полей эпика (id=3) после удаление подзадачи (id=4):");
+        System.out.println(taskManager.getEpic(3));
+        System.out.println("\nИстория просмотров (5, 7, 6, 2, 1, 3):");
+        for (Task task : taskManager.getHistory()) {
+            System.out.println(task);
+        }
 
         // проверка на изменение статуса эпика
-        System.out.println("\nПроверка изменения статуса эпика(id=3) после изменения статуса его сабтасок на DONE");
-        System.out.println("\nПроверка изменения статуса эпика(id=3) после изменения статуса его сабтасок на DONE");
-        taskManager.setStatus(4, Status.DONE);
         taskManager.setStatus(5, Status.DONE);
         taskManager.setStatus(6, Status.DONE);
-        System.out.println(taskManager.getAllTasks());
+        System.out.println("\nПроверка изменения статуса эпика (id=3) после изменения статуса его подзадач на DONE:");
+        System.out.println(taskManager.getEpic(3));
 
-        // проверка полей эпика на удаление подзадачи
-        System.out.println("\nПроверка изменения полей эпика(id=3) после удаление подзадачи(id=4)");
-        taskManager.deleteTask(4);
-        System.out.println(taskManager.getAllTasks());
+
+        // удаление задач и проверка списка задач и истории просмотров
+        taskManager.deleteTask(3);
+        System.out.println("\nСписок задач (удалён id=3 и его подзадачи id=[5, 6]):");
+        for (Task task : taskManager.getAllTasksSortedById()) {
+            System.out.println(task);
+        }
+        System.out.println("\nИстория просмотров (7, 2, 1):");
+        for (Task task : taskManager.getHistory()) {
+            System.out.println(task);
+        }
+
+        taskManager.deleteAllTasks();
+        System.out.println("\nСписок задач (удалены все задачи):");
+        System.out.println(taskManager.getAllTasks()); // []
+        System.out.println("История просмотров (удалена вся история):");
+        System.out.println(taskManager.getHistory()); // []*/
 
         // восстановление из файла
         TaskManager restoredTaskManager = loadFromFile(new File("history.csv"));
@@ -114,23 +119,29 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println("\nВосстановленный менеджер равен сохранённому:");
         System.out.println(restoredTaskManager.equals(taskManager));
         System.out.println("\nСписок восстановленных задач:");
-        System.out.println(restoredTaskManager.getAllTasks());
+        for (Task task : restoredTaskManager.getAllTasksSortedById()) {
+            System.out.println(task);
+        }
         System.out.println("\nВосстановленная история просмотров:");
-        System.out.println(restoredTaskManager.getHistory());
+        for (Task task : restoredTaskManager.getHistory()) {
+            System.out.println(task);
+        }
 
         // проверка idCounter после восстановления
         System.out.println("\nСледующая задача будет создана с id=" + taskManager.getIdCounter());
         Epic epic3 = new Epic("Epic id=8", "Description Epic id=8");
         taskManager.addEpic(epic3);
-        System.out.println(taskManager.getAllTasks());*/
+        System.out.println(taskManager.getEpic(8));
 
-        // список задач в порядке приоритета
-        System.out.println("\nСписок задач в порядке приоритета:\n" + taskManager.getPrioritizedTasks());
+        // список задач и подзадач в порядке приоритета
+        System.out.println("\nСписок задач и подзадач в порядке приоритета:");
+        for (Task task : taskManager.getPrioritizedTasks()) {
+            System.out.println(task);
+        }
 
-/*        // измерение времени выполнения кода
-        long start = System.nanoTime();
+        // стоп секундомер
         long finish = System.nanoTime();
-        System.out.println("\n" + (finish - start) / 1000000 + " миллисекунд");*/
+        System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
     }
 
     private static String historyToString(HistoryManager manager) {

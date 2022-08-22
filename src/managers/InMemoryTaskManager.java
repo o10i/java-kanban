@@ -8,6 +8,7 @@ import tasks.Task;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Task> taskMap = new HashMap<>();
@@ -17,6 +18,8 @@ public class InMemoryTaskManager implements TaskManager {
     protected int idCounter = 1;
     protected Set<Task> treeSet = new TreeSet<>(Comparator.comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder())));
     protected Map<LocalDateTime, Boolean> intersectionMap = fillIntersectionMap();
+    private static final LocalDateTime start = LocalDateTime.of(2022, 1, 1, 0, 0);
+    private static final LocalDateTime end = LocalDateTime.of(2023, 1, 1, 0, 0);
 
     @Override
     public void addTask(Task task) {
@@ -25,7 +28,7 @@ public class InMemoryTaskManager implements TaskManager {
             taskMap.put(idCounter++, task);
             treeSet.add(task);
         } else {
-            System.out.println("Обнаружено пересечение задач, задача не добавлена.");
+            throw new IllegalArgumentException("Обнаружено пересечение задач, задача '" + task.getTitle() + "' не добавлена.");
         }
     }
 
@@ -33,7 +36,6 @@ public class InMemoryTaskManager implements TaskManager {
     public void addEpic(Epic epic) {
         epic.setId(idCounter);
         epicMap.put(idCounter++, epic);
-        treeSet.add(epic);
     }
 
     @Override
@@ -48,7 +50,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
             determineEpicFields(subtask.getParentEpicId());
         } else {
-            System.out.println("Обнаружено пересечение задач, подзадача не добавлена.");
+            throw new IllegalArgumentException("Обнаружено пересечение задач, подзадача '" + subtask.getTitle() + "' не добавлена.");
         }
     }
 
@@ -132,6 +134,11 @@ public class InMemoryTaskManager implements TaskManager {
         allTasksList.addAll(epicMap.values());
         allTasksList.addAll(subtaskMap.values());
         return allTasksList;
+    }
+
+    @Override
+    public List<Task> getAllTasksSortedById() {
+        return getAllTasks().stream().sorted(Comparator.comparingInt(Task::getId)).collect(Collectors.toList());
     }
 
     @Override
@@ -262,14 +269,18 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private boolean checkIntersection(Task task) {
+        if (task.getStartTime().isBefore(start) || task.getEndTime().isAfter(end)) {
+            throw new IllegalArgumentException("Время начала и завершения задач доступно только на 2022 год");
+        }
         LocalDateTime taskStart = task.getStartTime().minusMinutes(task.getStartTime().getMinute() % 15); // округление до четверти часа в меньшую сторону
-        LocalDateTime taskEnd = task.getEndTime().minusMinutes(15 - task.getEndTime().getMinute() % 15); // округление до четверти часа в большую сторону
+        LocalDateTime taskEnd = task.getEndTime(); // округление до четверти часа в меньшую сторону
+
         for (LocalDateTime i = taskStart; i.isBefore(taskEnd); i = i.plusMinutes(15)) {
             if (!intersectionMap.get(i)) {
                 return false;
             }
         }
-        for (LocalDateTime i = taskStart; i.isBefore(taskEnd) || i.isEqual(taskEnd); i = i.plusMinutes(15)) {
+        for (LocalDateTime i = taskStart; i.isBefore(taskEnd); i = i.plusMinutes(15)) {
             intersectionMap.put(i, false);
         }
         return true;
@@ -277,11 +288,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     private Map<LocalDateTime, Boolean> fillIntersectionMap() {
         Map<LocalDateTime, Boolean> intersectionMap = new HashMap<>();
-        LocalDateTime start = LocalDateTime.of(2022, 1, 1, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2023, 1, 1, 0, 0);
-        while (start.isBefore(end)) {
-            intersectionMap.put(start, true);
-            start = start.plusMinutes(15);
+        for (LocalDateTime i = start; i.isBefore(end); i = i.plusMinutes(15)) {
+            intersectionMap.put(i, true);
         }
         return intersectionMap;
     }

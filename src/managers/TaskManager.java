@@ -19,6 +19,8 @@ public interface TaskManager {
 
     void deleteAllTasks();
 
+    void determineEpicStatus(int id);
+
     Task getTask(Integer id);
 
     Epic getEpic(Integer id);
@@ -32,6 +34,8 @@ public interface TaskManager {
     List<Subtask> getSubtasks();
 
     List<Task> getAllTasks();
+
+    List<Task> getAllTasksSortedById();
 
     List<Subtask> getSubtasksByEpicId(int id);
 
