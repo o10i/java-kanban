@@ -1,8 +1,10 @@
-package managers;
+package managers.task;
 
-import exception.ManagerSaveException;
+import exceptions.ManagerSaveException;
+import tasks.enums.Type;
+import managers.history.HistoryManager;
 import tasks.Epic;
-import tasks.Status;
+import tasks.enums.Status;
 import tasks.Subtask;
 import tasks.Task;
 
@@ -14,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
@@ -27,6 +28,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private final int DURATION = 5;
     private final int START_TIME = 6;
     private final int EPIC = 7;
+    private final String TABLE_HEADER = "id,type,name,status,description,duration,startTime,epic\n";
 
     public FileBackedTasksManager(String fileName) {
         this.fileName = fileName;
@@ -231,32 +233,23 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public Task getTask(Integer id) {
-        if (taskMap.containsKey(id)) {
-            historyManager.add(taskMap.get(id));
-            save();
-            return taskMap.get(id);
-        }
-        return null;
+        Task task = super.getTask(id);
+        save();
+        return task;
     }
 
     @Override
     public Epic getEpic(Integer id) {
-        if (epicMap.containsKey(id)) {
-            historyManager.add(epicMap.get(id));
-            save();
-            return epicMap.get(id);
-        }
-        return null;
+        Epic epic = super.getEpic(id);
+        save();
+        return epic;
     }
 
     @Override
     public Subtask getSubtask(Integer id) {
-        if (subtaskMap.containsKey(id)) {
-            historyManager.add(subtaskMap.get(id));
-            save();
-            return subtaskMap.get(id);
-        }
-        return null;
+        Subtask subtask = super.getSubtask(id);
+        save();
+        return subtask;
     }
 
     @Override
@@ -325,9 +318,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write("id,type,name,status,description,duration,startTime,epic\n");
-            List<Task> tasks = getAllTasks();
-            tasks.sort(Comparator.comparingInt(Task::getId));
+            writer.write(TABLE_HEADER);
+            List<Task> tasks = getAllTasksSortedById();
             for (Task task : tasks) {
                 writer.write(toString(task));
                 writer.write("\n");

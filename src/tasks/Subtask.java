@@ -1,6 +1,7 @@
 package tasks;
 
-import managers.Type;
+import tasks.enums.Status;
+import tasks.enums.Type;
 
 import java.time.LocalDateTime;
 

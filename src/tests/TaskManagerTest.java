@@ -1,9 +1,9 @@
 package tests;
 
-import managers.TaskManager;
+import managers.task.TaskManager;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
-import tasks.Status;
+import tasks.enums.Status;
 import tasks.Subtask;
 import tasks.Task;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static tasks.Status.*;
+import static tasks.enums.Status.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     protected T taskManager;
