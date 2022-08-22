@@ -13,69 +13,10 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Task> taskMap = new HashMap<>();
     protected final Map<Integer, Epic> epicMap = new HashMap<>();
     protected final Map<Integer, Subtask> subtaskMap = new HashMap<>();
-    protected final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected HistoryManager historyManager = Managers.getDefaultHistory();
     protected int idCounter = 1;
     protected Set<Task> treeSet = new TreeSet<>(Comparator.comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder())));
     protected Map<LocalDateTime, Boolean> intersectionMap = fillIntersectionMap();
-
-    @Override
-    public List<Task> getTasks() {
-        return new ArrayList<>(taskMap.values());
-    }
-
-    @Override
-    public List<Epic> getEpics() {
-        return new ArrayList<>(epicMap.values());
-    }
-
-    @Override
-    public List<Subtask> getSubtasks() {
-        return new ArrayList<>(subtaskMap.values());
-    }
-
-    @Override
-    public List<Task> getAllTasks() {
-        List<Task> allTasksList = new ArrayList<>();
-        allTasksList.addAll(taskMap.values());
-        allTasksList.addAll(epicMap.values());
-        allTasksList.addAll(subtaskMap.values());
-        return allTasksList;
-    }
-
-    @Override
-    public void deleteAllTasks() {
-        taskMap.clear();
-        epicMap.clear();
-        subtaskMap.clear();
-        treeSet.clear();
-    }
-
-    @Override
-    public Task getTask(Integer id) {
-        if (taskMap.containsKey(id)) {
-            historyManager.add(taskMap.get(id));
-            return taskMap.get(id);
-        }
-        return null;
-    }
-
-    @Override
-    public Epic getEpic(Integer id) {
-        if (epicMap.containsKey(id)) {
-            historyManager.add(epicMap.get(id));
-            return epicMap.get(id);
-        }
-        return null;
-    }
-
-    @Override
-    public Subtask getSubtask(Integer id) {
-        if (subtaskMap.containsKey(id)) {
-            historyManager.add(subtaskMap.get(id));
-            return subtaskMap.get(id);
-        }
-        return null;
-    }
 
     @Override
     public void addTask(Task task) {
@@ -108,6 +49,131 @@ public class InMemoryTaskManager implements TaskManager {
             determineEpicFields(subtask.getParentEpicId());
         } else {
             System.out.println("Обнаружено пересечение задач, подзадача не добавлена.");
+        }
+    }
+
+    @Override
+    public void deleteTask(Integer id) {
+        if (taskMap.containsKey(id)) {
+            treeSet.remove(taskMap.get(id));
+            taskMap.remove(id);
+        } else if (epicMap.containsKey(id)) {
+            List<Integer> subtasksId = List.copyOf(epicMap.get(id).getSubtasksId());
+            for (Integer subtaskId : subtasksId) {
+                deleteTask(subtaskId);
+            }
+            treeSet.remove(epicMap.get(id));
+            epicMap.remove(id);
+        } else if (subtaskMap.containsKey(id)) {
+            Epic parentEpic = epicMap.get(subtaskMap.get(id).getParentEpicId());
+            parentEpic.removeSubtaskId(id);
+            treeSet.remove(subtaskMap.get(id));
+            subtaskMap.remove(id);
+            determineEpicFields(parentEpic.getId());
+        }
+        historyManager.remove(id);
+    }
+
+    @Override
+    public void deleteAllTasks() {
+        taskMap.clear();
+        epicMap.clear();
+        subtaskMap.clear();
+        historyManager = Managers.getDefaultHistory();
+        treeSet.clear();
+    }
+
+    @Override
+    public Task getTask(Integer id) {
+        if (taskMap.containsKey(id)) {
+            historyManager.add(taskMap.get(id));
+            return taskMap.get(id);
+        }
+        return null;
+    }
+
+    @Override
+    public Epic getEpic(Integer id) {
+        if (epicMap.containsKey(id)) {
+            historyManager.add(epicMap.get(id));
+            return epicMap.get(id);
+        }
+        return null;
+    }
+
+    @Override
+    public Subtask getSubtask(Integer id) {
+        if (subtaskMap.containsKey(id)) {
+            historyManager.add(subtaskMap.get(id));
+            return subtaskMap.get(id);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Task> getTasks() {
+        return new ArrayList<>(taskMap.values());
+    }
+
+    @Override
+    public List<Epic> getEpics() {
+        return new ArrayList<>(epicMap.values());
+    }
+
+    @Override
+    public List<Subtask> getSubtasks() {
+        return new ArrayList<>(subtaskMap.values());
+    }
+
+    @Override
+    public List<Task> getAllTasks() {
+        List<Task> allTasksList = new ArrayList<>();
+        allTasksList.addAll(taskMap.values());
+        allTasksList.addAll(epicMap.values());
+        allTasksList.addAll(subtaskMap.values());
+        return allTasksList;
+    }
+
+    @Override
+    public int getIdCounter() {
+        return idCounter;
+    }
+
+    @Override
+    public Status getStatus(Integer id) {
+        if (taskMap.containsKey(id)) {
+            return taskMap.get(id).getStatus();
+        }
+        if (epicMap.containsKey(id)) {
+            return epicMap.get(id).getStatus();
+        }
+        if (subtaskMap.containsKey(id)) {
+            return subtaskMap.get(id).getStatus();
+        }
+        return null;
+    }
+
+    @Override
+    public List<Subtask> getSubtasksByEpicId(int id) {
+        List<Subtask> epicSubtasks = new ArrayList<>();
+        for (Integer subtaskId : epicMap.get(id).getSubtasksId()) {
+            epicSubtasks.add(subtaskMap.get(subtaskId));
+        }
+        return epicSubtasks;
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
+    @Override
+    public void setStatus(Integer id, Status status) {
+        if (taskMap.containsKey(id)) {
+            taskMap.get(id).setStatus(status);
+        } else if (subtaskMap.containsKey(id)) {
+            subtaskMap.get(id).setStatus(status);
+            determineEpicStatus(subtaskMap.get(id).getParentEpicId());
         }
     }
 
@@ -146,111 +212,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTask(Integer id) {
-        if (taskMap.containsKey(id)) {
-            treeSet.remove(taskMap.get(id));
-            taskMap.remove(id);
-        } else if (epicMap.containsKey(id)) {
-            List<Integer> subtasksId = List.copyOf(epicMap.get(id).getSubtasksId());
-            for (Integer subtaskId : subtasksId) {
-                deleteTask(subtaskId);
-            }
-            treeSet.remove(epicMap.get(id));
-            epicMap.remove(id);
-        } else if (subtaskMap.containsKey(id)) {
-            Epic parentEpic = epicMap.get(subtaskMap.get(id).getParentEpicId());
-            parentEpic.removeSubtaskIdByObject(id);
-            treeSet.remove(subtaskMap.get(id));
-            subtaskMap.remove(id);
-            determineEpicFields(parentEpic.getId());
-        }
-        historyManager.remove(id);
-    }
-
-    @Override
-    public List<Subtask> getSubtasksByEpicId(int id) {
-        List<Subtask> epicSubtasks = new ArrayList<>();
-        for (Integer subtaskId : epicMap.get(id).getSubtasksId()) {
-            epicSubtasks.add(subtaskMap.get(subtaskId));
-        }
-        return epicSubtasks;
-    }
-
-    @Override
-    public Status getStatus(Integer id) {
-        if (taskMap.containsKey(id)) {
-            return taskMap.get(id).getStatus();
-        }
-        if (epicMap.containsKey(id)) {
-            return epicMap.get(id).getStatus();
-        }
-        if (subtaskMap.containsKey(id)) {
-            return subtaskMap.get(id).getStatus();
-        }
-        return null;
-    }
-
-    @Override
-    public void setStatus(Integer id, Status status) {
-        if (taskMap.containsKey(id)) {
-            taskMap.get(id).setStatus(status);
-        } else if (subtaskMap.containsKey(id)) {
-            subtaskMap.get(id).setStatus(status);
-            determineEpicStatus(subtaskMap.get(id).getParentEpicId());
-        }
-    }
-
-    public void determineEpicFields(int id) {
-        determineEpicStatus(id);
-        determineEpicDuration(id);
-        determineEpicStartTime(id);
-    }
-
-    public void determineEpicStatus(int id) {
-        if (getSubtasksByEpicId(id).stream().allMatch(subtask -> subtask.getStatus().equals(Status.NEW))) {
-            epicMap.get(id).setStatus(Status.NEW);
-        } else if (getSubtasksByEpicId(id).stream().allMatch(subtask -> subtask.getStatus().equals(Status.DONE))) {
-            epicMap.get(id).setStatus(Status.DONE);
-        } else {
-            epicMap.get(id).setStatus(Status.IN_PROGRESS);
-        }
-    }
-
-    public void determineEpicDuration(int id) {
-        if (!getSubtasksByEpicId(id).isEmpty()) {
-            long duration = getSubtasksByEpicId(id).stream()
-                    .map(Subtask::getDuration)
-                    .map(Duration::getSeconds)
-                    .mapToInt(Math::toIntExact)
-                    .sum() / 60;
-            epicMap.get(id).setDuration(duration);
-        }
-    }
-
-    public void determineEpicStartTime(int id) {
-        if (!getSubtasksByEpicId(id).isEmpty()) {
-            LocalDateTime startTime = getSubtasksByEpicId(id).stream()
-                    .map(Subtask::getStartTime)
-                    .min(LocalDateTime::compareTo)
-                    .get();
-            epicMap.get(id).setStartTime(startTime);
-        }
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        return historyManager.getHistory();
-    }
-
-    public HistoryManager getHistoryManager() {
-        return historyManager;
-    }
-
-    public int getIdCounter() {
-        return idCounter;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -263,20 +224,41 @@ public class InMemoryTaskManager implements TaskManager {
         return Objects.hash(taskMap, epicMap, subtaskMap, historyManager, idCounter);
     }
 
-    // пока без
+    public void determineEpicStatus(int id) {
+        if (getSubtasksByEpicId(id).stream().allMatch(subtask -> subtask.getStatus().equals(Status.NEW))) {
+            epicMap.get(id).setStatus(Status.NEW);
+        } else if (getSubtasksByEpicId(id).stream().allMatch(subtask -> subtask.getStatus().equals(Status.DONE))) {
+            epicMap.get(id).setStatus(Status.DONE);
+        } else {
+            epicMap.get(id).setStatus(Status.IN_PROGRESS);
+        }
+    }
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
     public Set<Task> getPrioritizedTasks() {
         return treeSet;
     }
 
-    private Map<LocalDateTime, Boolean> fillIntersectionMap() {
-        Map<LocalDateTime, Boolean> intersectionMap = new HashMap<>();
-        LocalDateTime start = LocalDateTime.of(2022, 1, 1, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2023, 1, 1, 0, 0);
-        while (start.isBefore(end)) {
-            intersectionMap.put(start, true);
-            start = start.plusMinutes(15);
+    protected void determineEpicFields(int id) {
+        determineEpicStatus(id);
+        determineEpicDuration(id);
+        determineEpicStartTime(id);
+    }
+
+    protected void determineEpicDuration(int id) {
+        if (!getSubtasksByEpicId(id).isEmpty()) {
+            long duration = getSubtasksByEpicId(id).stream().map(Subtask::getDuration).map(Duration::getSeconds).mapToInt(Math::toIntExact).sum() / 60;
+            epicMap.get(id).setDuration(duration);
         }
-        return intersectionMap;
+    }
+
+    protected void determineEpicStartTime(int id) {
+        if (!getSubtasksByEpicId(id).isEmpty()) {
+            LocalDateTime startTime = getSubtasksByEpicId(id).stream().map(Subtask::getStartTime).min(LocalDateTime::compareTo).orElse(null);
+            epicMap.get(id).setStartTime(startTime);
+        }
     }
 
     private boolean checkIntersection(Task task) {
@@ -291,5 +273,16 @@ public class InMemoryTaskManager implements TaskManager {
             intersectionMap.put(i, false);
         }
         return true;
+    }
+
+    private Map<LocalDateTime, Boolean> fillIntersectionMap() {
+        Map<LocalDateTime, Boolean> intersectionMap = new HashMap<>();
+        LocalDateTime start = LocalDateTime.of(2022, 1, 1, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2023, 1, 1, 0, 0);
+        while (start.isBefore(end)) {
+            intersectionMap.put(start, true);
+            start = start.plusMinutes(15);
+        }
+        return intersectionMap;
     }
 }

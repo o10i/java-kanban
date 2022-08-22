@@ -14,15 +14,15 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
+    public List<Task> getHistory() {
+        return historyList.getTasks();
+    }
+
+    @Override
     public void remove(int id) {
         if (historyList.hashMap.containsKey(id)) {
             historyList.removeNode(historyList.hashMap.get(id));
         }
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        return historyList.getTasks();
     }
 
     @Override

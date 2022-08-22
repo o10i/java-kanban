@@ -52,20 +52,12 @@ public class Subtask extends Task {
         return Type.SUBTASK;
     }
 
-    public int getParentEpicId() {
-        return parentEpicId;
-    }
-
     @Override
     public String toString() {
-        return "Subtask{" +
-                "parentEpicId=" + parentEpicId +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                ", duration=" + duration.getSeconds() / 60 +
-                ", startTime=" + startTime +
-                '}';
+        return "Subtask{" + "parentEpicId=" + parentEpicId + ", title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id + ", status=" + status + ", duration=" + duration.getSeconds() / 60 + ", startTime=" + startTime + '}';
+    }
+
+    public int getParentEpicId() {
+        return parentEpicId;
     }
 }

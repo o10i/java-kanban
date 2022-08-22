@@ -52,6 +52,10 @@ public class Epic extends Task {
         return Type.EPIC;
     }
 
+    @Override
+    public String toString() {
+        return "Epic{" + "subtasksId=" + subtasksId + ", title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id + ", status=" + status + ", duration=" + duration.getSeconds() / 60 + ", startTime=" + startTime + '}';
+    }
 
     public void addSubtaskId(Integer id) {
         subtasksId.add(id);
@@ -65,24 +69,11 @@ public class Epic extends Task {
         return subtasksId;
     }
 
-    public void removeSubtaskIdByObject(Object o) {
-        subtasksId.remove(o);
+    public void removeSubtaskId(Integer subtaskId) {
+        subtasksId.remove(subtaskId);
     }
 
     public void removeSubtaskDuration(Duration duration) {
         this.duration = this.duration.minus(duration);
-    }
-
-    @Override
-    public String toString() {
-        return "Epic{" +
-                "subtasksId=" + subtasksId +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                ", duration=" + duration.getSeconds() / 60 +
-                ", startTime=" + startTime +
-                '}';
     }
 }

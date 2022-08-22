@@ -98,16 +98,41 @@ public class Task {
         this.status = status;
     }
 
-    public Type getType() {
-        return Type.TASK;
+    public String getDescription() {
+        return description;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = Duration.ofMinutes(duration);
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public String getDescription() {
-        return description;
+    public Type getType() {
+        return Type.TASK;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id + ", status=" + status + ", duration=" + duration.getSeconds() / 60 + ", startTime=" + startTime + '}';
     }
 
     @Override
@@ -121,37 +146,5 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(title, description, id, status);
-    }
-
-    public LocalDateTime getEndTime() {
-        return startTime.plus(duration);
-    }
-
-    public Duration getDuration() {
-        return duration;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Task{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                ", duration=" + duration.getSeconds() / 60 +
-                ", startTime=" + startTime +
-                '}';
-    }
-
-    public void setDuration(long duration) {
-        this.duration = Duration.ofMinutes(duration);
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
     }
 }

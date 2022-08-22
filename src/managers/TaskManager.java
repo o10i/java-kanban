@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Set;
 
 public interface TaskManager {
-    List<Task> getAllTasks();
+    void addTask(Task task);
 
-    List<Task> getTasks();
+    void addEpic(Epic epic);
 
-    List<Epic> getEpics();
+    void addSubtask(Subtask subtask);
 
-    List<Subtask> getSubtasks();
+    void deleteTask(Integer id);
 
     void deleteAllTasks();
 
@@ -25,31 +25,29 @@ public interface TaskManager {
 
     Subtask getSubtask(Integer id);
 
-    void addTask(Task task);
+    List<Task> getTasks();
 
-    void addEpic(Epic epic);
+    List<Epic> getEpics();
 
-    void addSubtask(Subtask subtask);
+    List<Subtask> getSubtasks();
+
+    List<Task> getAllTasks();
+
+    List<Subtask> getSubtasksByEpicId(int id);
+
+    Status getStatus(Integer id);
+
+    List<Task> getHistory();
+
+    int getIdCounter();
+
+    Set<Task> getPrioritizedTasks();
+
+    void setStatus(Integer id, Status status);
 
     void updateTask(Task task);
 
     void updateEpic(Epic epic);
 
     void updateSubtask(Subtask subtask);
-
-    void deleteTask(Integer id);
-
-    List<Subtask> getSubtasksByEpicId(int id);
-
-    Status getStatus(Integer id);
-
-    void setStatus(Integer id, Status status);
-
-    List<Task> getHistory();
-
-    int getIdCounter();
-
-    void determineEpicStatus(int epicId);
-
-    Set<Task> getPrioritizedTasks();
 }
