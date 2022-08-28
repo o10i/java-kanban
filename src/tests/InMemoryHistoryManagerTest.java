@@ -3,59 +3,88 @@ package tests;
 import managers.history.InMemoryHistoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tasks.Epic;
+import tasks.Subtask;
 import tasks.Task;
+import tasks.enums.Status;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static tasks.enums.Status.NEW;
 
 class InMemoryHistoryManagerTest {
+    private static int idCounter = 0;
     private InMemoryHistoryManager historyManager;
-    private Task task;
+
+    private static Task newTask() {
+        idCounter++;
+        return new Task("Test Task" + idCounter, "Test Task description" + idCounter, NEW, idCounter, LocalDateTime.of(2022, idCounter, 14 + idCounter, idCounter, 0));
+    }
+
+    private static Epic newEpic() {
+        idCounter++;
+        return new Epic("Test Epic" + idCounter, "Test Epic description" + idCounter);
+    }
+
+    private static Subtask newSubtask(Status status, int epicId) {
+        idCounter++;
+        return new Subtask("Test Subtasks" + idCounter, "Test Subtasks description" + idCounter, status, idCounter, LocalDateTime.of(2022, idCounter, idCounter, idCounter, 0), epicId);
+    }
 
     @BeforeEach
-    void newManager() {
+    void setUp() {
+        idCounter = 0;
         historyManager = new InMemoryHistoryManager();
-        task = new Task("Test Task", "Test Task description", 1,
-                1, LocalDateTime.of(2021, 1, 1, 0, 0));
     }
 
     @Test
     void add() {
+        Task task = newTask();
         historyManager.add(task);
+
         final List<Task> history = historyManager.getHistory();
+
         assertNotNull(history, "Список истории отсутствует.");
         assertEquals(1, history.size(), "История пустая.");
     }
 
     @Test
     void addDouble() {
-        historyManager.add(task);
+        Task task1 = newTask();
+        historyManager.add(task1);
 
-        Task taskDouble = new Task("Test addDouble", "Test addDouble description", 1,
-                1, LocalDateTime.of(2021, 1, 1, 0, 0));
-        historyManager.add(taskDouble);
+        Task task2 = newTask();
+        task2.setId(task1.getId());
+        historyManager.add(task2);
 
         final List<Task> history = historyManager.getHistory();
+
         assertNotNull(history, "Список истории отсутствует.");
         assertEquals(1, history.size(), "Дубликат задачи не заменён.");
     }
 
     @Test
     void removeFirstTask() {
-        historyManager.add(task);
+        Task task1 = newTask();
+        task1.setId(1);
+        historyManager.add(task1);
 
-        Task task2 = new Task("Test removeFirstTask", "Test removeFirstTask description", 2);
+        Task task2 = newTask();
+        task2.setId(2);
         historyManager.add(task2);
-        Task task3 = new Task("Test removeFirstTask", "Test removeFirstTask description", 3);
+
+        Task task3 = newTask();
+        task3.setId(3);
         historyManager.add(task3);
 
         final List<Task> history = historyManager.getHistory();
+
         assertNotNull(history, "Список истории отсутствует.");
         assertEquals(3, history.size(), "История содержит не 3 элемента.");
 
-        historyManager.remove(task.getId());
+        historyManager.remove(task1.getId());
 
         final List<Task> historyAfterRemove = historyManager.getHistory();
 
@@ -66,16 +95,20 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void removeMiddleTask() {
-        historyManager.add(task);
+        Task task1 = newTask();
+        task1.setId(1);
+        historyManager.add(task1);
 
-        Task task2 = new Task("Test removeMiddleTask", "Test removeMiddleTask description", 2,
-                2, LocalDateTime.of(2022, 2, 2, 0, 0));
+        Task task2 = newTask();
+        task2.setId(2);
         historyManager.add(task2);
-        Task task3 = new Task("Test removeMiddleTask", "Test removeMiddleTask description", 3,
-                3, LocalDateTime.of(2023, 3, 3, 0, 0));
+
+        Task task3 = newTask();
+        task3.setId(3);
         historyManager.add(task3);
 
         final List<Task> history = historyManager.getHistory();
+
         assertNotNull(history, "Список истории отсутствует.");
         assertEquals(3, history.size(), "История содержит не 3 элемента.");
 
@@ -90,16 +123,20 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void removeLastTask() {
-        historyManager.add(task);
+        Task task1 = newTask();
+        task1.setId(1);
+        historyManager.add(task1);
 
-        Task task2 = new Task("Test removeLastTask", "Test removeLastTask description", 2,
-                2, LocalDateTime.of(2022, 2, 2, 0, 0));
+        Task task2 = newTask();
+        task2.setId(2);
         historyManager.add(task2);
-        Task task3 = new Task("Test removeLastTask", "Test removeLastTask description", 3,
-        3, LocalDateTime.of(2023, 3, 3, 0, 0));
+
+        Task task3 = newTask();
+        task2.setId(3);
         historyManager.add(task3);
 
         final List<Task> history = historyManager.getHistory();
+
         assertNotNull(history, "Список истории отсутствует.");
         assertEquals(3, history.size(), "История содержит не 3 элемента.");
 
@@ -115,15 +152,18 @@ class InMemoryHistoryManagerTest {
     @Test
     void getZeroElementHistory() {
         final List<Task> history = historyManager.getHistory();
+
         assertNotNull(history, "Список истории отсутствует.");
         assertThrows(IndexOutOfBoundsException.class, () -> history.get(0), "Элемент не должен возвращаться.");
     }
 
     @Test
     void getOneElementHistory() {
+        Task task = newTask();
         historyManager.add(task);
 
         final List<Task> history = historyManager.getHistory();
+
         assertNotNull(history, "Список истории отсутствует.");
         assertEquals(1, history.size(), "История не пустая.");
     }
