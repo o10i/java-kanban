@@ -20,7 +20,7 @@ class InMemoryHistoryManagerTest {
 
     private static Task newTask() {
         idCounter++;
-        return new Task("Test Task" + idCounter, "Test Task description" + idCounter, NEW, idCounter, LocalDateTime.of(2022, idCounter, 14 + idCounter, idCounter, 0));
+        return new Task("Test Task" + idCounter, NEW, "Test Task description" + idCounter, idCounter, LocalDateTime.of(2022, idCounter, 14 + idCounter, idCounter, 0));
     }
 
     private static Epic newEpic() {
@@ -30,7 +30,7 @@ class InMemoryHistoryManagerTest {
 
     private static Subtask newSubtask(Status status, int epicId) {
         idCounter++;
-        return new Subtask("Test Subtasks" + idCounter, "Test Subtasks description" + idCounter, status, idCounter, LocalDateTime.of(2022, idCounter, idCounter, idCounter, 0), epicId);
+        return new Subtask("Test Subtasks" + idCounter, status, "Test Subtasks description" + idCounter, idCounter, LocalDateTime.of(2022, idCounter, idCounter, idCounter, 0), epicId);
     }
 
     @BeforeEach
@@ -146,6 +146,7 @@ class InMemoryHistoryManagerTest {
 
         assertNotNull(history, "Список истории отсутствует.");
         assertEquals(2, historyAfterRemove.size(), "Задача из истории не удалена.");
+        //noinspection ResultOfMethodCallIgnored
         assertThrows(IndexOutOfBoundsException.class, () -> historyAfterRemove.get(2), "Задача с конца не удалена");
     }
 
@@ -154,6 +155,7 @@ class InMemoryHistoryManagerTest {
         final List<Task> history = historyManager.getHistory();
 
         assertNotNull(history, "Список истории отсутствует.");
+        //noinspection ResultOfMethodCallIgnored
         assertThrows(IndexOutOfBoundsException.class, () -> history.get(0), "Элемент не должен возвращаться.");
     }
 

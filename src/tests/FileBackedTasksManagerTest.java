@@ -85,13 +85,18 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         taskManager.addEpic(epic);
         taskManager.getEpic(taskManager.getEpics().get(0).getId());
         taskManager.save();
+
         FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
         String content = Files.readString(Path.of(filename));
+
         final List<Task> tasks = restoredManager.getAllTasks();
 
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,EPIC,Test Epic1,NEW,Test Epic description1,0,null,\n\n" + "1", content, "Список истории пуст.");
+        Epic loadedEpic = (Epic) tasks.get(0);
+        loadedEpic.setStatus(NEW);
+
+        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,EPIC,Test Epic1,null,Test Epic description1,0,null,\n\n" + "1", content, "Список истории пуст.");
         assertNotNull(tasks, "Задачи на возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
-        assertEquals(epic, tasks.get(0), "Список задач не совпадает.");
+        assertEquals(epic, loadedEpic, "Список задач не совпадает.");
     }
 }

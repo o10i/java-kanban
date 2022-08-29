@@ -20,7 +20,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     protected static Task newTask(Status status) {
         idCounter++;
-        return new Task("Test Task" + idCounter, "Test Task description" + idCounter, status, idCounter, LocalDateTime.of(2022, idCounter, 14 + idCounter, idCounter, 0));
+        return new Task("Test Task" + idCounter, status, "Test Task description" + idCounter, idCounter, LocalDateTime.of(2022, idCounter, 14 + idCounter, idCounter, 0));
     }
 
     protected static Epic newEpic() {
@@ -30,7 +30,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     protected static Subtask newSubtask(Status status, int epicId) {
         idCounter++;
-        return new Subtask("Test Subtasks" + idCounter, "Test Subtasks description" + idCounter, status, idCounter, LocalDateTime.of(2022, idCounter, idCounter, idCounter, 0), epicId);
+        return new Subtask("Test Subtasks" + idCounter, status, "Test Subtasks description" + idCounter, idCounter, LocalDateTime.of(2022, idCounter, idCounter, idCounter, 0), epicId);
     }
 
     @Test

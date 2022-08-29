@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static tasks.enums.Type.*;
+
 public class FileBackedTasksManager extends InMemoryTaskManager {
     private final String fileName;
     private final int ID = 0;
@@ -27,7 +29,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private final int DESCRIPTION = 4;
     private final int DURATION = 5;
     private final int START_TIME = 6;
-    private final int EPIC = 7;
+    private final int PARENT_EPIC = 7;
     private final String TABLE_HEADER = "id,type,name,status,description,duration,startTime,epic\n";
 
     public FileBackedTasksManager(String fileName) {
@@ -82,7 +84,27 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             System.out.println(task);
         }
 
-        /*// проверка полей эпика и истории просмотров после удаление подзадачи
+/*        // обновление задач
+        Task updatedTask = new Task("Обновлённая задача", "Для проверки", 60, LocalDateTime.of(2022, 1, 1, 0, 0));
+        updatedTask.setId(1);
+        taskManager.updateTask(updatedTask);
+        Epic updatedEpic = new Epic("Обновлённый эпик", "Для проверки");
+        updatedEpic.setId(3);
+        taskManager.updateEpic(updatedEpic);
+        Subtask updatedSubtask = new Subtask("Обновлённая подзадача", "Для проверки", 30, LocalDateTime.of(2022, 12, 31, 23, 30), epic1.getId());
+        updatedSubtask.setId(4);
+        taskManager.updateSubtask(updatedSubtask);
+        System.out.println("\nСписок обновлённых задач id=[1,3,4]:");
+        for (Task task : taskManager.getAllTasksSortedById()) {
+            System.out.println(task);
+        }
+        System.out.println("\nИстория просмотров после обновления задач, не должна меняться (5, 4, 3, 7, 6, 2, 1):");
+        for (Task task : taskManager.getHistory()) {
+            System.out.println(task);
+        }
+
+
+        // проверка полей эпика и истории просмотров после удаление подзадачи
         taskManager.deleteTask(4);
         System.out.println("\nПроверка изменения полей эпика (id=3) после удаление подзадачи (id=4):");
         System.out.println(taskManager.getEpic(3));
@@ -96,7 +118,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         taskManager.setStatus(6, Status.DONE);
         System.out.println("\nПроверка изменения статуса эпика (id=3) после изменения статуса его подзадач на DONE:");
         System.out.println(taskManager.getEpic(3));
-
 
         // удаление задач и проверка списка задач и истории просмотров
         taskManager.deleteTask(3);
@@ -282,16 +303,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private Task fromString(String value) {
         String[] el = value.split(",");
-        if (Type.valueOf(el[TYPE]).equals(Type.TASK)) {
+        if (Type.valueOf(el[TYPE]).equals(TASK)) {
             return new Task(Integer.parseInt(el[ID]), el[NAME], Status.valueOf(el[STATUS]), el[DESCRIPTION], Long.parseLong(el[DURATION]), LocalDateTime.parse(el[START_TIME]));
         }
-        if (Type.valueOf(el[TYPE]).equals(Type.EPIC)) {
-            if (el[START_TIME].equals("null")) {
-                return new Epic(Integer.parseInt(el[ID]), el[NAME], Status.valueOf(el[STATUS]), el[DESCRIPTION], Long.parseLong(el[DURATION]));
-            }
-            return new Epic(Integer.parseInt(el[ID]), el[NAME], Status.valueOf(el[STATUS]), el[DESCRIPTION], Long.parseLong(el[DURATION]), LocalDateTime.parse(el[START_TIME]));
+        if (Type.valueOf(el[TYPE]).equals(EPIC)) {
+            return new Epic(Integer.parseInt(el[ID]), el[NAME], el[DESCRIPTION]);
         }
-        return new Subtask(Integer.parseInt(el[ID]), el[NAME], Status.valueOf(el[STATUS]), el[DESCRIPTION], Long.parseLong(el[DURATION]), LocalDateTime.parse(el[START_TIME]), Integer.parseInt(el[EPIC]));
+        return new Subtask(Integer.parseInt(el[ID]), el[NAME], Status.valueOf(el[STATUS]), el[DESCRIPTION], Long.parseLong(el[DURATION]), LocalDateTime.parse(el[START_TIME]), Integer.parseInt(el[PARENT_EPIC]));
     }
 
     private String toString(Task task) {
@@ -300,7 +318,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         taskToString.append(",");
         taskToString.append(task.getType());
         taskToString.append(",");
-        taskToString.append(task.getTitle());
+        taskToString.append(task.getName());
         taskToString.append(",");
         taskToString.append(task.getStatus());
         taskToString.append(",");
