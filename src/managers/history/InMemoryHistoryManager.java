@@ -25,19 +25,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        InMemoryHistoryManager that = (InMemoryHistoryManager) o;
-        return Objects.equals(historyList, that.historyList);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(historyList);
-    }
-
     private static class CustomLinkedList<E extends Task> {
         private final Map<Integer, Node<E>> hashMap = new HashMap<>();
         private Node<E> first;

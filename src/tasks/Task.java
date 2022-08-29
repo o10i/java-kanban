@@ -22,7 +22,7 @@ public class Task {
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        status = NEW;
+        this.status = NEW;
     }
 
     public Task(String name, String description, long duration, LocalDateTime startTime) {
@@ -47,6 +47,7 @@ public class Task {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.status = NEW;
     }
 
     public Task(int id, String name, Status status, String description, long duration, LocalDateTime startTime) {

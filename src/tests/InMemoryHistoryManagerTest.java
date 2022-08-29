@@ -66,6 +66,26 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
+    void getZeroElementHistory() {
+        final List<Task> history = historyManager.getHistory();
+
+        assertNotNull(history, "Список истории отсутствует.");
+        //noinspection ResultOfMethodCallIgnored
+        assertThrows(IndexOutOfBoundsException.class, () -> history.get(0), "Элемент не должен возвращаться.");
+    }
+
+    @Test
+    void getOneElementHistory() {
+        Task task = newTask();
+        historyManager.add(task);
+
+        final List<Task> history = historyManager.getHistory();
+
+        assertNotNull(history, "Список истории отсутствует.");
+        assertEquals(1, history.size(), "История не пустая.");
+    }
+
+    @Test
     void removeFirstTask() {
         Task task1 = newTask();
         task1.setId(1);
@@ -148,25 +168,5 @@ class InMemoryHistoryManagerTest {
         assertEquals(2, historyAfterRemove.size(), "Задача из истории не удалена.");
         //noinspection ResultOfMethodCallIgnored
         assertThrows(IndexOutOfBoundsException.class, () -> historyAfterRemove.get(2), "Задача с конца не удалена");
-    }
-
-    @Test
-    void getZeroElementHistory() {
-        final List<Task> history = historyManager.getHistory();
-
-        assertNotNull(history, "Список истории отсутствует.");
-        //noinspection ResultOfMethodCallIgnored
-        assertThrows(IndexOutOfBoundsException.class, () -> history.get(0), "Элемент не должен возвращаться.");
-    }
-
-    @Test
-    void getOneElementHistory() {
-        Task task = newTask();
-        historyManager.add(task);
-
-        final List<Task> history = historyManager.getHistory();
-
-        assertNotNull(history, "Список истории отсутствует.");
-        assertEquals(1, history.size(), "История не пустая.");
     }
 }

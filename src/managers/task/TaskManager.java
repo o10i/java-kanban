@@ -39,8 +39,6 @@ public interface TaskManager {
 
     List<Subtask> getSubtasks();
 
-    List<Task> getAllTasks();
-
     List<Task> getAllTasksSortedById();
 
     Set<Task> getPrioritizedTasks();

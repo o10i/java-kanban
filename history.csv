@@ -1,3 +1,11 @@
 id,type,name,status,description,duration,startTime,epic
-1,TASK,Test Task1,NEW,Test Task description1,1,2022-01-15T01:00,
+1,TASK,Купить автомобиль,NEW,Для семейных целей,60,2022-01-01T00:00,
+2,TASK,Продать квартиру,NEW,Пока цена хорошая,60,2022-01-01T01:00,
+3,EPIC,Дела на даче,NEW,Летние работы,90,2022-01-01T02:00,
+4,SUBTASK,Вишня,NEW,Собрать вишню,30,2022-12-31T23:30,3
+5,SUBTASK,Огород,NEW,Вспахать огород,30,2022-01-01T02:00,3
+6,SUBTASK,Черешня,NEW,Собрать черешню,30,2022-01-01T02:30,3
+7,EPIC,Досуг сына,NEW,Найти подходящую секцию,0,null,
+8,EPIC,Epic id=8,NEW,Description Epic id=8,0,null,
 
+5,4,3,7,6,2,1,8
