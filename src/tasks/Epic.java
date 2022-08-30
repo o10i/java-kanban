@@ -1,6 +1,5 @@
 package tasks;
 
-import tasks.enums.Status;
 import tasks.enums.Type;
 
 import java.time.Duration;
