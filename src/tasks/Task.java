@@ -15,7 +15,7 @@ public class Task {
     protected String name;
     protected Status status;
     protected String description;
-    protected Duration duration = Duration.ZERO;
+    protected Duration duration;
     protected LocalDateTime startTime;
     protected LocalDateTime endTime;
 
@@ -31,7 +31,6 @@ public class Task {
         this.duration = Duration.ofMinutes(duration);
         this.startTime = startTime;
         this.status = NEW;
-        this.endTime = startTime.plus(this.duration);
     }
 
     public Task(String name, Status status, String description, long duration, LocalDateTime startTime) {
@@ -93,7 +92,10 @@ public class Task {
     }
 
     public Duration getDuration() {
-        return duration;
+        if (duration != null) {
+            return duration;
+        }
+        return Duration.ZERO;
     }
 
     public void setDuration(long duration) {
@@ -109,6 +111,7 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
+        endTime = startTime.plus(this.duration);
         return endTime;
     }
 

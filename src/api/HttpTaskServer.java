@@ -149,12 +149,12 @@ public class HttpTaskServer {
                         case "/tasks/subtask/":
                             Subtask subtask = gson.fromJson(body, Subtask.class);
 
-                            if (subtask.getId() > 0) {
+                            if (taskManager.getSubtaskById(subtask.getId()) != null) {
                                 taskManager.updateSubtask(subtask);
-                                response = "Задача обновлена";
+                                response = "Подзадача обновлена";
                             } else {
                                 taskManager.addSubtask(subtask);
-                                response = "Задача добавлена";
+                                response = "Подзадача добавлена";
                             }
 
                             exchange.sendResponseHeaders(201, 0);
@@ -162,12 +162,12 @@ public class HttpTaskServer {
                         case "/tasks/epic/":
                             Epic epic = gson.fromJson(body, Epic.class);
 
-                            if (epic.getId() > 0) {
+                            if (taskManager.getEpicById(epic.getId()) != null) {
                                 taskManager.updateEpic(epic);
-                                response = "Задача обновлена";
+                                response = "Эпик обновлён";
                             } else {
                                 taskManager.addEpic(epic);
-                                response = "Задача добавлена";
+                                response = "Эпик добавлен";
                             }
 
                             exchange.sendResponseHeaders(201, 0);

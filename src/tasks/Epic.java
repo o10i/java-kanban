@@ -3,6 +3,7 @@ package tasks;
 import tasks.enums.Type;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,11 @@ public class Epic extends Task {
 
     public void removeSubtaskDuration(Duration duration) {
         this.duration = this.duration.minus(duration);
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     @Override
