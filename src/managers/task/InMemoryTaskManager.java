@@ -259,7 +259,7 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager;
     }
 
-    protected boolean checkAndUpdateIntersectionWhenTaskAdded(Task task) {
+    public boolean checkAndUpdateIntersectionWhenTaskAdded(Task task) {
         if (task.getStartTime().isBefore(start) || task.getEndTime().isAfter(end)) {
             throw new IllegalArgumentException("Время начала и завершения задач доступно только на 2022 год");
         }
