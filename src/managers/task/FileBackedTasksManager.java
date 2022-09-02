@@ -183,7 +183,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             Task task = fromString(tasks[i]);
             if (task instanceof Epic) {
                 updateEpic((Epic) task);
-            } else if (checkAndUpdateIntersectionWhenTaskAdded(task)) {
+            } else if (checkIntersection(task)) {
                 if (task instanceof Subtask) {
                     updateSubtask((Subtask) task);
                 } else {

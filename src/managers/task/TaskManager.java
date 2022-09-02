@@ -30,5 +30,5 @@ public interface TaskManager {
     List<Subtask> getEpicSubtasks(int id);
     List<Task> getHistory();
     Set<Task> getPrioritizedTasks();
-    boolean checkAndUpdateIntersectionWhenTaskAdded(Task task);
+    boolean checkIntersection(Task task);
 }

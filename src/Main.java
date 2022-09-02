@@ -9,6 +9,9 @@ import tasks.Task;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+// Привет! Рад знакомству) 7-ой спринт предыдущим ревьюером был практически не проверен,
+// прошу по возможности проверить тщательно, дотошно, я буду только рад, даже если это займёт больше времени)
+// спасибо!
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         // запуск секундомера

@@ -3,7 +3,7 @@ package api;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import managers.Managers;
+import managers.task.FileBackedTasksManager;
 import managers.task.TaskManager;
 import tasks.Epic;
 import tasks.Subtask;
@@ -17,16 +17,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class HttpTaskServer {
     public static final int PORT = 8080;
     private final Gson gson = new Gson();
-    private final TaskManager taskManager = Managers.getDefault();
+    private final TaskManager taskManager = new FileBackedTasksManager("history.csv");
     private final HttpServer server;
 
-    public HttpTaskServer() throws IOException, InterruptedException {
-        server = HttpServer.create(new InetSocketAddress(PORT), 0);
-        server.createContext("/tasks", this::tasks);
+    public static void main(String[] args) throws IOException {
+        new HttpTaskServer().start();
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        new HttpTaskServer().start();
+    public HttpTaskServer() throws IOException {
+        server = HttpServer.create(new InetSocketAddress(PORT), 0);
+        server.createContext("/tasks", this::tasks);
     }
 
     private void tasks(HttpExchange exchange) throws IOException {
@@ -150,7 +150,7 @@ public class HttpTaskServer {
                 taskManager.updateTask(task);
                 System.out.println("\nЗадача обновлена");
                 exchange.sendResponseHeaders(200, 0);
-            } else if (taskManager.checkAndUpdateIntersectionWhenTaskAdded(task)) {
+            } else if (taskManager.checkIntersection(task)) {
                 taskManager.addTask(task);
                 System.out.println("\nЗадача добавлена");
                 exchange.sendResponseHeaders(201, 0);
@@ -164,7 +164,7 @@ public class HttpTaskServer {
                 taskManager.updateSubtask(subtask);
                 System.out.println("\nПодзадача обновлена");
                 exchange.sendResponseHeaders(200, 0);
-            } else if (taskManager.checkAndUpdateIntersectionWhenTaskAdded(subtask)) {
+            } else if (taskManager.checkIntersection(subtask)) {
                 taskManager.addSubtask(subtask);
                 System.out.println("\nПодзадача добавлена");
                 exchange.sendResponseHeaders(201, 0);
@@ -264,5 +264,8 @@ public class HttpTaskServer {
     public void start() {
         System.out.println("Запускаем сервер на порту " + PORT);
         server.start();
+    }
+    public void stop() {
+        server.stop(1);
     }
 }

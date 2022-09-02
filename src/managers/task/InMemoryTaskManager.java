@@ -68,7 +68,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addTask(Task task) {
-        if (checkAndUpdateIntersectionWhenTaskAdded(task)) {
+        if (checkIntersection(task)) {
+            updateIntersectionWhenTaskAdded(task);
             task.setId(idCounter);
             taskMap.put(idCounter++, task);
             treeSet.add(task);
@@ -79,7 +80,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addSubtask(Subtask subtask) {
-        if (checkAndUpdateIntersectionWhenTaskAdded(subtask)) {
+        if (checkIntersection(subtask)) {
+            updateIntersectionWhenTaskAdded(subtask);
             subtask.setId(idCounter);
             subtaskMap.put(idCounter++, subtask);
             treeSet.add(subtask);
@@ -259,7 +261,7 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager;
     }
 
-    public boolean checkAndUpdateIntersectionWhenTaskAdded(Task task) {
+    public boolean checkIntersection(Task task) {
         if (task.getStartTime().isBefore(start) || task.getEndTime().isAfter(end)) {
             throw new IllegalArgumentException("Время начала и завершения задач доступно только на 2022 год");
         }
@@ -271,10 +273,16 @@ public class InMemoryTaskManager implements TaskManager {
                 return false;
             }
         }
+        return true;
+    }
+
+    protected void updateIntersectionWhenTaskAdded(Task task) {
+        LocalDateTime taskStart = task.getStartTime().minusMinutes(task.getStartTime().getMinute() % 15); // округление до четверти часа в меньшую сторону
+        LocalDateTime taskEnd = task.getEndTime();
+
         for (LocalDateTime i = taskStart; i.isBefore(taskEnd); i = i.plusMinutes(15)) {
             intersectionMap.put(i, false);
         }
-        return true;
     }
 
     protected void updateIntersectionWhenTaskDeleted(Task task) {
