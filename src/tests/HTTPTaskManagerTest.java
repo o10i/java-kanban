@@ -1,62 +1,74 @@
 package tests;
 
-import managers.task.FileBackedTasksManager;
+import api.KVServer;
+import managers.task.HTTPTaskManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
+class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
+    private final KVServer server = new KVServer();
+    private final String serverURL = "http://localhost:8078";
+    private final String key = "1";
+
+    HTTPTaskManagerTest() throws IOException {
+    }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException, InterruptedException {
         idCounter = 0;
-        taskManager = new FileBackedTasksManager(filename);
+        server.start();
+        taskManager = new HTTPTaskManager(serverURL);
+    }
+
+    @AfterEach
+    void tearDown() {
+        server.stop();
     }
 
     @Test
-    void saveEmptyTasksFile() throws IOException {
+    void saveEmptyTasksToServer() throws IOException, InterruptedException {
         taskManager.save();
-        String content = Files.readString(Path.of(filename));
+        String content = taskManager.getClient().load(key);
         assertEquals("id,type,name,status,description,duration,startTime,epic\n\n", content, "Список задач не пуст.");
     }
 
     @Test
-    void saveEmptyHistoryFile() throws IOException {
+    void saveEmptyHistoryToServer() throws IOException, InterruptedException {
         Task task = newTask();
         taskManager.addTask(task);
         taskManager.save();
-        String content = Files.readString(Path.of(filename));
+        String content = taskManager.getClient().load(key);
 
         assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,TASK,Test Task1,NEW,Test Task description1,1,2022-01-15T01:00,\n\n", content, "Список истории не пуст.");
     }
 
     @Test
-    void saveOnlyEpicFile() throws IOException {
+    void saveOnlyEpicToServer() throws IOException, InterruptedException {
         Epic epic = newEpic();
         taskManager.addEpic(epic);
         taskManager.getEpicById(taskManager.getEpics().get(0).getId());
         taskManager.save();
-        String content = Files.readString(Path.of(filename));
+        String content = taskManager.getClient().load(key);
 
         assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,EPIC,Test Epic1,NEW,Test Epic description1,0,null,\n\n" + "1", content, "Список истории пуст.");
     }
 
     @Test
-    void loadFromEmptyTasksFile() throws IOException {
+    void loadFromEmptyTasksFromServer() throws IOException, InterruptedException {
         taskManager.save();
-        FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
-        String content = Files.readString(Path.of(filename));
+
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
+        String content = taskManager.getClient().load(key);
 
         final List<Task> tasks = restoredManager.getTasks();
         final List<Subtask> subtasks = restoredManager.getSubtasks();
@@ -72,14 +84,14 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
-    void loadFromOnlyEpicFile() throws IOException {
+    void loadFromOnlyEpicFromServer() throws IOException, InterruptedException {
         Epic epic = newEpic();
         taskManager.addEpic(epic);
         taskManager.getEpicById(taskManager.getEpics().get(0).getId());
         taskManager.save();
 
-        FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
-        String content = Files.readString(Path.of(filename));
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
+        String content = taskManager.getClient().load(key);
 
         final List<Epic> epics = restoredManager.getEpics();
 
@@ -92,12 +104,13 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
-    void loadFromEmptyHistoryFile() throws IOException {
+    void loadFromEmptyHistoryFromServer() throws IOException, InterruptedException {
         Task task = newTask();
         taskManager.addTask(task);
         taskManager.save();
-        FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
-        String content = Files.readString(Path.of(filename));
+
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
+        String content = taskManager.getClient().load(key);
 
         final List<Task> tasks = restoredManager.getTasks();
         final List<Task> history = restoredManager.getHistory();

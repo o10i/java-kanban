@@ -17,15 +17,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class HttpTaskServer {
     public static final int PORT = 8080;
     private final Gson gson = new Gson();
-    private final TaskManager taskManager = new Managers().getDefault();
+    private final TaskManager taskManager = Managers.getDefault();
     private final HttpServer server;
 
-    public HttpTaskServer() throws IOException {
+    public HttpTaskServer() throws IOException, InterruptedException {
         server = HttpServer.create(new InetSocketAddress(PORT), 0);
         server.createContext("/tasks", this::tasks);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         new HttpTaskServer().start();
     }
 
@@ -262,44 +262,7 @@ public class HttpTaskServer {
     }
 
     public void start() {
-        //fillTasks();
         System.out.println("Запускаем сервер на порту " + PORT);
         server.start();
     }
-
-/*    void fillTasks() {
-        Task task1 = new Task("Купить автомобиль", "Для семейных целей", 60, LocalDateTime.of(2022, 1, 1, 0, 0));
-        taskManager.addTask(task1);
-
-        Task task2 = new Task("Продать квартиру", "Пока цена хорошая", 60, LocalDateTime.of(2022, 1, 1, 1, 0));
-        taskManager.addTask(task2);
-
-        Epic epic1 = new Epic("Дела на даче", "Летние работы");
-        taskManager.addEpic(epic1);
-        Subtask subtask11 = new Subtask("Вишня", "Собрать вишню", 30, LocalDateTime.of(2022, 12, 31, 23, 30), epic1.getId());
-        taskManager.addSubtask(subtask11);
-        Subtask subtask12 = new Subtask("Огород", "Вспахать огород", 30, LocalDateTime.of(2022, 1, 1, 2, 0), epic1.getId());
-        taskManager.addSubtask(subtask12);
-        Subtask subtask13 = new Subtask("Черешня", "Собрать черешню", 30, LocalDateTime.of(2022, 1, 1, 2, 30), epic1.getId());
-        taskManager.addSubtask(subtask13);
-
-        Epic epic2 = new Epic("Досуг сына", "Найти подходящую секцию");
-        taskManager.addEpic(epic2);
-
-        // создание истории просмотров
-        taskManager.getEpicById(7);
-        taskManager.getSubtaskById(5);
-        taskManager.getEpicById(3);
-        taskManager.getSubtaskById(4);
-        taskManager.getEpicById(3);
-        taskManager.getTaskById(2);
-        taskManager.getTaskById(1);
-        taskManager.getEpicById(7);
-        taskManager.getTaskById(2);
-        taskManager.getSubtaskById(6);
-        taskManager.getTaskById(2);
-        taskManager.getTaskById(1);
-
-        System.out.println("\nЗадачи для теста добавлены");
-    }*/
 }

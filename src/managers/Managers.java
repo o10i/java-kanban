@@ -2,12 +2,14 @@ package managers;
 
 import managers.history.HistoryManager;
 import managers.history.InMemoryHistoryManager;
-import managers.task.FileBackedTasksManager;
+import managers.task.HTTPTaskManager;
 import managers.task.TaskManager;
 
+import java.io.IOException;
+
 public class Managers {
-    public TaskManager getDefault() {
-        return new FileBackedTasksManager("history.csv");
+    public static TaskManager getDefault() throws IOException, InterruptedException {
+        return new HTTPTaskManager("http://localhost:8078");
     }
 
     public static HistoryManager getDefaultHistory() {
