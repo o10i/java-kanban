@@ -25,7 +25,6 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         }
         sb.append("\n");
         sb.append(historyToString(getHistoryManager()));
-        //System.out.println(sb);
         try {
             client.put(String.valueOf(key), sb.toString());
         } catch (IOException | InterruptedException e) {
