@@ -94,8 +94,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     @Test
     void loadFromEmptyHistoryFile() throws IOException {
         Task task = newTask();
-        taskManager.addTask(task);
-        taskManager.save();
+        int taskId = taskManager.addTask(task);
         FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
         String content = Files.readString(Path.of(filename));
 

@@ -1,4 +1,4 @@
-package api;
+package http;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -47,7 +47,7 @@ public class KVServer {
                 String response = data.get(key);
                 System.out.println("Значение для ключа " + key + " успешно возвращено!");
                 sendText(h, response);
-            } else  {
+            } else {
                 System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());
                 h.sendResponseHeaders(405, 0);
             }
@@ -104,10 +104,15 @@ public class KVServer {
     }
 
     public void start() {
-        System.out.println("Запускаем сервер на порту " + PORT);
+        System.out.println("Запускаем KVServer на порту " + PORT);
         System.out.println("Открой в браузере http://localhost:" + PORT + "/");
         System.out.println("API_TOKEN: " + apiToken);
         server.start();
+    }
+
+    public void stop() {
+        server.stop(0);
+        System.out.println("Остановили KVServer на порту " + PORT);
     }
 
     private String generateApiToken() {
@@ -119,8 +124,8 @@ public class KVServer {
         return rawQuery != null && (rawQuery.contains("API_TOKEN=" + apiToken) || rawQuery.contains("API_TOKEN=DEBUG"));
     }
 
-    protected String readText(HttpExchange exchange) throws IOException {
-        return new String(exchange.getRequestBody().readAllBytes(), UTF_8);
+    protected String readText(HttpExchange h) throws IOException {
+        return new String(h.getRequestBody().readAllBytes(), UTF_8);
     }
 
     protected void sendText(HttpExchange h, String text) throws IOException {
@@ -128,9 +133,5 @@ public class KVServer {
         h.getResponseHeaders().add("Content-Type", "application/json");
         h.sendResponseHeaders(200, resp.length);
         h.getResponseBody().write(resp);
-    }
-
-    public void stop() {
-        server.stop(1);
     }
 }

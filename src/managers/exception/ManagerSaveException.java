@@ -1,4 +1,4 @@
-package exceptions;
+package managers.exception;
 
 public class ManagerSaveException extends RuntimeException {
     public ManagerSaveException() {

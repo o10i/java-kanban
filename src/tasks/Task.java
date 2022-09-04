@@ -29,7 +29,7 @@ public class Task {
         this.name = name;
         this.description = description;
         this.duration = Duration.ofMinutes(duration);
-        this.startTime = startTime;
+        this.startTime = startTime.minusSeconds(startTime.getSecond()).minusNanos(startTime.getNano());
         this.status = NEW;
     }
 
@@ -38,8 +38,8 @@ public class Task {
         this.status = status;
         this.description = description;
         this.duration = Duration.ofMinutes(duration);
-        this.startTime = startTime;
-        this.endTime = startTime.plus(this.duration);
+        this.startTime = startTime.minusSeconds(startTime.getSecond()).minusNanos(startTime.getNano());
+        this.endTime = this.startTime.plus(this.duration);
     }
 
     public Task(int id, String name, String description) {
@@ -55,8 +55,8 @@ public class Task {
         this.id = id;
         this.status = status;
         this.duration = Duration.ofMinutes(duration);
-        this.startTime = startTime;
-        this.endTime = startTime.plus(this.duration);
+        this.startTime = startTime.minusSeconds(startTime.getSecond()).minusNanos(startTime.getNano());
+        this.endTime = this.startTime.plus(this.duration);
     }
 
     public int getId() {

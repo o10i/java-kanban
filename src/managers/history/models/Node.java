@@ -1,4 +1,4 @@
-package managers.models;
+package managers.history.models;
 
 public class Node<E> {
     public E item;

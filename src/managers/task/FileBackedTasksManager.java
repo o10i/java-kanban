@@ -1,6 +1,6 @@
 package managers.task;
 
-import exceptions.ManagerSaveException;
+import managers.exception.ManagerSaveException;
 import managers.history.HistoryManager;
 import tasks.Epic;
 import tasks.Subtask;
@@ -26,6 +26,7 @@ import static tasks.enums.Type.TASK;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
     protected final String fileName;
+    protected final String TABLE_HEADER = "id,type,name,status,description,duration,startTime,epic\n";
     private final int ID = 0;
     private final int TYPE = 1;
     private final int NAME = 2;
@@ -34,10 +35,60 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private final int DURATION = 5;
     private final int START_TIME = 6;
     private final int PARENT_EPIC = 7;
-    protected final String TABLE_HEADER = "id,type,name,status,description,duration,startTime,epic\n";
 
     public FileBackedTasksManager(String fileName) {
         this.fileName = fileName;
+    }
+
+    public static void main(String[] args) {
+        long start = System.nanoTime();
+        FileBackedTasksManager taskManager = new FileBackedTasksManager("history.csv");
+
+        fillData(taskManager);
+
+        TaskManager fbtm = FileBackedTasksManager.loadFromFile(new File("history.csv"));
+
+        System.out.println("\nВосстановленный менеджер равен сохранённому:");
+        System.out.println(fbtm.equals(taskManager));
+        System.out.println("\nСписок восстановленных задач:");
+        printTasks(fbtm);
+        System.out.println("\nВосстановленная история просмотров:");
+        for (Task task : fbtm.getHistory()) {
+            System.out.println(task);
+        }
+
+        System.out.println("\nСледующая задача будет создана с id=8");
+        Epic epic3 = new Epic("Epic3", "Epic3 description");
+        fbtm.addEpic(epic3);
+        System.out.println(fbtm.getEpicById(8));
+
+        System.out.println("\nСписок задач и подзадач в порядке приоритета:");
+        for (Task task : taskManager.getPrioritizedTasks()) {
+            System.out.println(task);
+        }
+
+        long finish = System.nanoTime();
+        System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
+    }
+
+    public static FileBackedTasksManager loadFromFile(File file) {
+        FileBackedTasksManager fbtm = new FileBackedTasksManager(file.getName());
+        String content;
+        try {
+            content = Files.readString(Path.of(file.getPath()));
+        } catch (IOException e) {
+            throw new ManagerSaveException(e);
+        }
+        String[] tasksAndHistory = content.split("\n\n");
+        String[] tasks = tasksAndHistory[0].split("\n");
+        fbtm.restoreMaps(tasks);
+        fbtm.idCounter = fbtm.getAllTasksSortedById().stream().map(Task::getId).max(Integer::compareTo).orElse(0);
+        if (tasksAndHistory.length > 1) {
+            String history = tasksAndHistory[1];
+            fbtm.restoreHistory(history);
+        }
+        fbtm.save();
+        return fbtm;
     }
 
     protected static String historyToString(HistoryManager manager) {
@@ -57,26 +108,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private static List<Integer> historyFromString(String value) {
         String[] el = value.split(",");
         return Arrays.stream(el).map(Integer::parseInt).collect(Collectors.toList());
-    }
-
-    public static FileBackedTasksManager loadFromFile(File file) {
-        FileBackedTasksManager fbtm = new FileBackedTasksManager(file.getName());
-        String content;
-        try {
-            content = Files.readString(Path.of(file.getPath()));
-        } catch (IOException e) {
-            throw new ManagerSaveException(e);
-        }
-        String[] tasksAndHistory = content.split("\n\n");
-        String[] tasks = tasksAndHistory[0].split("\n");
-        fbtm.restoreMaps(tasks);
-        fbtm.idCounter = fbtm.getAllTasksSortedById().stream().map(Task::getId).max(Integer::compareTo).orElse(0) + 1;
-        if (tasksAndHistory.length > 1) {
-            String history = tasksAndHistory[1];
-            fbtm.restoreHistory(history);
-        }
-        fbtm.save();
-        return fbtm;
     }
 
     @Override
@@ -101,21 +132,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void addTask(Task task) {
-        super.addTask(task);
+    public int addTask(Task task) {
+        int id = super.addTask(task);
         save();
+        return id;
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
-        super.addSubtask(subtask);
+    public int addSubtask(Subtask subtask) {
+        int id = super.addSubtask(subtask);
         save();
+        return id;
     }
 
     @Override
-    public void addEpic(Epic epic) {
-        super.addEpic(epic);
+    public int addEpic(Epic epic) {
+        int id = super.addEpic(epic);
         save();
+        return id;
     }
 
     @Override
@@ -181,16 +215,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     protected void restoreMaps(String[] tasks) {
         for (int i = 1; i < tasks.length; i++) {
             Task task = fromString(tasks[i]);
+            int id = task.getId();
             if (task instanceof Epic) {
-                updateEpic((Epic) task);
-            } else if (checkIntersection(task)) {
-                if (task instanceof Subtask) {
-                    updateSubtask((Subtask) task);
-                } else {
-                    updateTask(task);
-                }
+                Epic epic = (Epic) task;
+                epicMap.put(id, epic);
+            } else if (task instanceof Subtask) {
+                Subtask subtask = (Subtask) task;
+                subtaskMap.put(id, subtask);
+                treeSet.add(subtask);
+                updateIntersectionWhenTaskAdded(subtask);
+                determineEpicFields(subtask.getEpicId());
             } else {
-                throw new IllegalArgumentException("Обнаружено пересечение задач, задача '" + task.getName() + "' не добавлена.");
+                taskMap.put(id, task);
+                treeSet.add(task);
+                updateIntersectionWhenTaskAdded(task);
             }
         }
     }
