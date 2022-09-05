@@ -25,7 +25,6 @@ class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
-        idCounter = 0;
         server.start();
         taskManager = new HTTPTaskManager(serverURL);
     }
@@ -44,81 +43,115 @@ class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
 
     @Test
     void saveEmptyHistoryToServer() throws IOException, InterruptedException {
-        Task task = newTask();
-        taskManager.addTask(task);
-        taskManager.save();
-        String content = taskManager.getClient().load(key);
+        addTasks();
 
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,TASK,Test Task1,NEW,Test Task description1,1,2022-01-15T01:00,\n\n", content, "Список истории не пуст.");
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        String content = restoredManager.getClient().load(key);
+
+        final List<Task> tasks = restoredManager.getTasks();
+        final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
+        final List<Task> history = restoredManager.getHistory();
+
+        assertNotNull(tasks, "Задачи на возвращаются.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
+        assertNotNull(history, "История на возвращается.");
+        assertEquals(1, tasks.size(), "Неверное количество задач.");
+        assertEquals(1, epics.size(), "Неверное количество эпиков.");
+        assertEquals(1, subtasks.size(), "Неверное количество подзадач.");
+        assertEquals(0, history.size(), "Неверное количество элементов в истории.");
     }
 
     @Test
     void saveOnlyEpicToServer() throws IOException, InterruptedException {
-        Epic epic = newEpic();
-        taskManager.addEpic(epic);
-        taskManager.getEpicById(taskManager.getEpics().get(0).getId());
-        taskManager.save();
-        String content = taskManager.getClient().load(key);
+        epicByDefault = new Epic("Test epic", "Test epic description");
+        int epicByDefaultId = taskManager.addEpic(epicByDefault);
+        taskManager.getEpicById(epicByDefaultId);
 
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,EPIC,Test Epic1,NEW,Test Epic description1,0,null,\n\n" + "1", content, "Список истории пуст.");
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        String content = restoredManager.getClient().load(key);
+
+        final List<Task> tasks = restoredManager.getTasks();
+        final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
+        final List<Task> history = restoredManager.getHistory();
+
+        assertNotNull(tasks, "Задачи на возвращаются.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
+        assertNotNull(history, "История на возвращается.");
+        assertEquals(0, tasks.size(), "Неверное количество задач.");
+        assertEquals(1, epics.size(), "Неверное количество эпиков.");
+        assertEquals(0, subtasks.size(), "Неверное количество подзадач.");
+        assertEquals(1, history.size(), "Неверное количество элементов в истории.");
     }
 
     @Test
     void loadFromEmptyTasksFromServer() throws IOException, InterruptedException {
         taskManager.save();
 
-        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
-        String content = taskManager.getClient().load(key);
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        String content = restoredManager.getClient().load(key);
 
         final List<Task> tasks = restoredManager.getTasks();
-        final List<Subtask> subtasks = restoredManager.getSubtasks();
         final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
+        final List<Task> history = restoredManager.getHistory();
 
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n\n", content, "Список задач не пуст.");
         assertNotNull(tasks, "Задачи на возвращаются.");
-        assertNotNull(subtasks, "Задачи на возвращаются.");
-        assertNotNull(epics, "Задачи на возвращаются.");
-        assertEquals(0, tasks.size(), "Список задач не пуст.");
-        assertEquals(0, subtasks.size(), "Список подзадач не пуст.");
-        assertEquals(0, epics.size(), "Список эпиков не пуст.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
+        assertNotNull(history, "История на возвращается.");
+        assertEquals(0, tasks.size(), "Неверное количество задач.");
+        assertEquals(0, epics.size(), "Неверное количество эпиков.");
+        assertEquals(0, subtasks.size(), "Неверное количество подзадач.");
+        assertEquals(0, history.size(), "Неверное количество элементов в истории.");
     }
 
     @Test
     void loadFromOnlyEpicFromServer() throws IOException, InterruptedException {
-        Epic epic = newEpic();
-        taskManager.addEpic(epic);
-        taskManager.getEpicById(taskManager.getEpics().get(0).getId());
-        taskManager.save();
+        epicByDefault = new Epic("Test epic", "Test epic description");
+        int epicByDefaultId = taskManager.addEpic(epicByDefault);
+        taskManager.getEpicById(epicByDefaultId);
 
-        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
-        String content = taskManager.getClient().load(key);
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        String content = restoredManager.getClient().load(key);
 
+        final List<Task> tasks = restoredManager.getTasks();
         final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
+        final List<Task> history = restoredManager.getHistory();
 
-        Epic loadedEpic = epics.get(0);
-
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,EPIC,Test Epic1,NEW,Test Epic description1,0,null,\n\n" + "1", content, "Список истории пуст.");
-        assertNotNull(epics, "Задачи на возвращаются.");
-        assertEquals(1, epics.size(), "Неверное количество задач.");
-        assertEquals(epic, loadedEpic, "Список задач не совпадает.");
+        assertNotNull(tasks, "Задачи на возвращаются.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
+        assertNotNull(history, "История на возвращается.");
+        assertEquals(0, tasks.size(), "Неверное количество задач.");
+        assertEquals(1, epics.size(), "Неверное количество эпиков.");
+        assertEquals(0, subtasks.size(), "Неверное количество подзадач.");
+        assertEquals(1, history.size(), "Неверное количество элементов в истории.");
     }
 
     @Test
     void loadFromEmptyHistoryFromServer() throws IOException, InterruptedException {
-        Task task = newTask();
-        taskManager.addTask(task);
-        taskManager.save();
+        addTasks();
 
-        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
-        String content = taskManager.getClient().load(key);
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        String content = restoredManager.getClient().load(key);
 
         final List<Task> tasks = restoredManager.getTasks();
+        final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
         final List<Task> history = restoredManager.getHistory();
 
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,TASK,Test Task1,NEW,Test Task description1,1,2022-01-15T01:00,\n\n", content, "Список истории не пуст.");
         assertNotNull(tasks, "Задачи на возвращаются.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
         assertNotNull(history, "История на возвращается.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
+        assertEquals(1, epics.size(), "Неверное количество эпиков.");
+        assertEquals(1, subtasks.size(), "Неверное количество подзадач.");
         assertEquals(0, history.size(), "Неверное количество элементов в истории.");
     }
 }

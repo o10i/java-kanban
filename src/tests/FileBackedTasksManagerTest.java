@@ -20,7 +20,6 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
     @BeforeEach
     void setUp() {
-        idCounter = 0;
         taskManager = new FileBackedTasksManager(filename);
     }
 
@@ -33,78 +32,115 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
     @Test
     void saveEmptyHistoryFile() throws IOException {
-        Task task = newTask();
-        taskManager.addTask(task);
-        taskManager.save();
+        addTasks();
+
+        FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
         String content = Files.readString(Path.of(filename));
 
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,TASK,Test Task1,NEW,Test Task description1,1,2022-01-15T01:00,\n\n", content, "Список истории не пуст.");
+        final List<Task> tasks = restoredManager.getTasks();
+        final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
+        final List<Task> history = restoredManager.getHistory();
+
+        assertNotNull(tasks, "Задачи на возвращаются.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
+        assertNotNull(history, "История на возвращается.");
+        assertEquals(1, tasks.size(), "Неверное количество задач.");
+        assertEquals(1, epics.size(), "Неверное количество эпиков.");
+        assertEquals(1, subtasks.size(), "Неверное количество подзадач.");
+        assertEquals(0, history.size(), "Неверное количество элементов в истории.");
     }
 
     @Test
     void saveOnlyEpicFile() throws IOException {
-        Epic epic = newEpic();
-        taskManager.addEpic(epic);
-        taskManager.getEpicById(taskManager.getEpics().get(0).getId());
-        taskManager.save();
+        epicByDefault = new Epic("Test epic", "Test epic description");
+        int epicByDefaultId = taskManager.addEpic(epicByDefault);
+        taskManager.getEpicById(epicByDefaultId);
+
+        FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
         String content = Files.readString(Path.of(filename));
 
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,EPIC,Test Epic1,NEW,Test Epic description1,0,null,\n\n" + "1", content, "Список истории пуст.");
+        final List<Task> tasks = restoredManager.getTasks();
+        final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
+        final List<Task> history = restoredManager.getHistory();
+
+        assertNotNull(tasks, "Задачи на возвращаются.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
+        assertNotNull(history, "История на возвращается.");
+        assertEquals(0, tasks.size(), "Неверное количество задач.");
+        assertEquals(1, epics.size(), "Неверное количество эпиков.");
+        assertEquals(0, subtasks.size(), "Неверное количество подзадач.");
+        assertEquals(1, history.size(), "Неверное количество элементов в истории.");
     }
 
     @Test
     void loadFromEmptyTasksFile() throws IOException {
         taskManager.save();
+
         FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
         String content = Files.readString(Path.of(filename));
 
         final List<Task> tasks = restoredManager.getTasks();
-        final List<Subtask> subtasks = restoredManager.getSubtasks();
         final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
+        final List<Task> history = restoredManager.getHistory();
 
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n\n", content, "Список задач не пуст.");
         assertNotNull(tasks, "Задачи на возвращаются.");
-        assertNotNull(subtasks, "Задачи на возвращаются.");
-        assertNotNull(epics, "Задачи на возвращаются.");
-        assertEquals(0, tasks.size(), "Список задач не пуст.");
-        assertEquals(0, subtasks.size(), "Список подзадач не пуст.");
-        assertEquals(0, epics.size(), "Список эпиков не пуст.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
+        assertNotNull(history, "История на возвращается.");
+        assertEquals(0, tasks.size(), "Неверное количество задач.");
+        assertEquals(0, epics.size(), "Неверное количество эпиков.");
+        assertEquals(0, subtasks.size(), "Неверное количество подзадач.");
+        assertEquals(0, history.size(), "Неверное количество элементов в истории.");
     }
 
     @Test
     void loadFromOnlyEpicFile() throws IOException {
-        Epic epic = newEpic();
-        taskManager.addEpic(epic);
-        taskManager.getEpicById(taskManager.getEpics().get(0).getId());
-        taskManager.save();
+        epicByDefault = new Epic("Test epic", "Test epic description");
+        int epicByDefaultId = taskManager.addEpic(epicByDefault);
+        taskManager.getEpicById(epicByDefaultId);
 
-        FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
-        String content = Files.readString(Path.of(filename));
-
-        final List<Epic> epics = restoredManager.getEpics();
-
-        Epic loadedEpic = epics.get(0);
-
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,EPIC,Test Epic1,NEW,Test Epic description1,0,null,\n\n" + "1", content, "Список истории пуст.");
-        assertNotNull(epics, "Задачи на возвращаются.");
-        assertEquals(1, epics.size(), "Неверное количество задач.");
-        assertEquals(epic, loadedEpic, "Список задач не совпадает.");
-    }
-
-    @Test
-    void loadFromEmptyHistoryFile() throws IOException {
-        Task task = newTask();
-        int taskId = taskManager.addTask(task);
         FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
         String content = Files.readString(Path.of(filename));
 
         final List<Task> tasks = restoredManager.getTasks();
+        final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
         final List<Task> history = restoredManager.getHistory();
 
-        assertEquals("id,type,name,status,description,duration,startTime,epic\n" + "1,TASK,Test Task1,NEW,Test Task description1,1,2022-01-15T01:00,\n\n", content, "Список истории не пуст.");
         assertNotNull(tasks, "Задачи на возвращаются.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
+        assertNotNull(history, "История на возвращается.");
+        assertEquals(0, tasks.size(), "Неверное количество задач.");
+        assertEquals(1, epics.size(), "Неверное количество эпиков.");
+        assertEquals(0, subtasks.size(), "Неверное количество подзадач.");
+        assertEquals(1, history.size(), "Неверное количество элементов в истории.");
+    }
+
+    @Test
+    void loadFromEmptyHistoryFile() throws IOException {
+        addTasks();
+
+        FileBackedTasksManager restoredManager = FileBackedTasksManager.loadFromFile(new File(filename));
+        String content = Files.readString(Path.of(filename));
+
+        final List<Task> tasks = restoredManager.getTasks();
+        final List<Epic> epics = restoredManager.getEpics();
+        final List<Subtask> subtasks = restoredManager.getSubtasks();
+        final List<Task> history = restoredManager.getHistory();
+
+        assertNotNull(tasks, "Задачи на возвращаются.");
+        assertNotNull(epics, "Эпики на возвращаются.");
+        assertNotNull(subtasks, "Подадачи на возвращаются.");
         assertNotNull(history, "История на возвращается.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
+        assertEquals(1, epics.size(), "Неверное количество эпиков.");
+        assertEquals(1, subtasks.size(), "Неверное количество подзадач.");
         assertEquals(0, history.size(), "Неверное количество элементов в истории.");
     }
 }

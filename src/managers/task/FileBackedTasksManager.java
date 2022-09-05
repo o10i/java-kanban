@@ -25,7 +25,6 @@ import static tasks.enums.Type.EPIC;
 import static tasks.enums.Type.TASK;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    protected final String fileName;
     protected final String TABLE_HEADER = "id,type,name,status,description,duration,startTime,epic\n";
     private final int ID = 0;
     private final int TYPE = 1;
@@ -35,40 +34,30 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private final int DURATION = 5;
     private final int START_TIME = 6;
     private final int PARENT_EPIC = 7;
+    protected String sourceName;
 
-    public FileBackedTasksManager(String fileName) {
-        this.fileName = fileName;
+    public FileBackedTasksManager(String sourceName) {
+        this.sourceName = sourceName;
     }
 
-    public static void main(String[] args) {
-        long start = System.nanoTime();
-        FileBackedTasksManager taskManager = new FileBackedTasksManager("history.csv");
 
-        fillData(taskManager);
-
-        TaskManager fbtm = FileBackedTasksManager.loadFromFile(new File("history.csv"));
-
-        System.out.println("\nВосстановленный менеджер равен сохранённому:");
-        System.out.println(fbtm.equals(taskManager));
-        System.out.println("\nСписок восстановленных задач:");
-        printTasks(fbtm);
-        System.out.println("\nВосстановленная история просмотров:");
-        for (Task task : fbtm.getHistory()) {
-            System.out.println(task);
+    protected static String historyToString(HistoryManager manager) {
+        List<Task> list = manager.getHistory();
+        StringBuilder history = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            if (i == list.size() - 1) {
+                history.append(list.get(i).getId());
+            } else {
+                history.append(list.get(i).getId());
+                history.append(",");
+            }
         }
+        return history.toString();
+    }
 
-        System.out.println("\nСледующая задача будет создана с id=8");
-        Epic epic3 = new Epic("Epic3", "Epic3 description");
-        fbtm.addEpic(epic3);
-        System.out.println(fbtm.getEpicById(8));
-
-        System.out.println("\nСписок задач и подзадач в порядке приоритета:");
-        for (Task task : taskManager.getPrioritizedTasks()) {
-            System.out.println(task);
-        }
-
-        long finish = System.nanoTime();
-        System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
+    private static List<Integer> historyFromString(String value) {
+        String[] el = value.split(",");
+        return Arrays.stream(el).map(Integer::parseInt).collect(Collectors.toList());
     }
 
     public static FileBackedTasksManager loadFromFile(File file) {
@@ -89,25 +78,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
         fbtm.save();
         return fbtm;
-    }
-
-    protected static String historyToString(HistoryManager manager) {
-        List<Task> list = manager.getHistory();
-        StringBuilder history = new StringBuilder();
-        for (int i = 0; i < list.size(); i++) {
-            if (i == list.size() - 1) {
-                history.append(list.get(i).getId());
-            } else {
-                history.append(list.get(i).getId());
-                history.append(",");
-            }
-        }
-        return history.toString();
-    }
-
-    private static List<Integer> historyFromString(String value) {
-        String[] el = value.split(",");
-        return Arrays.stream(el).map(Integer::parseInt).collect(Collectors.toList());
     }
 
     @Override
@@ -189,7 +159,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public void save() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(sourceName))) {
             writer.write(TABLE_HEADER);
             List<Task> tasks = getAllTasksSortedById();
             for (Task task : tasks) {
@@ -255,4 +225,35 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     protected List<Task> getAllTasksSortedById() {
         return Stream.concat(Stream.concat(taskMap.values().stream(), epicMap.values().stream()), subtaskMap.values().stream()).sorted(Comparator.comparingInt(Task::getId)).collect(Collectors.toList());
     }
+
+    /*    public static void main(String[] args) {
+            long start = System.nanoTime();
+            FileBackedTasksManager taskManager = new FileBackedTasksManager("history.csv");
+
+            fillData(taskManager);
+
+            TaskManager fbtm = FileBackedTasksManager.loadFromFile(new File("history.csv"));
+
+            System.out.println("\nВосстановленный менеджер равен сохранённому:");
+            System.out.println(fbtm.equals(taskManager));
+            System.out.println("\nСписок восстановленных задач:");
+            printTasks(fbtm);
+            System.out.println("\nВосстановленная история просмотров:");
+            for (Task task : fbtm.getHistory()) {
+                System.out.println(task);
+            }
+
+            System.out.println("\nСледующая задача будет создана с id=8");
+            Epic epic3 = new Epic("Epic3", "Epic3 description");
+            fbtm.addEpic(epic3);
+            System.out.println(fbtm.getEpicById(8));
+
+            System.out.println("\nСписок задач и подзадач в порядке приоритета:");
+            for (Task task : taskManager.getPrioritizedTasks()) {
+                System.out.println(task);
+            }
+
+            long finish = System.nanoTime();
+            System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
+        }*/
 }

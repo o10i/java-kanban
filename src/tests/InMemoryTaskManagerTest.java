@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     @BeforeEach
     void setUp() {
-        idCounter = 0;
         taskManager = new InMemoryTaskManager();
     }
 }

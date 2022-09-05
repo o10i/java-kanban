@@ -24,14 +24,16 @@ public class InMemoryTaskManager implements TaskManager {
     protected Set<Task> treeSet = new TreeSet<>(Comparator.comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder())));
     protected Map<LocalDateTime, Boolean> intersectionMap = fillIntersectionMap();
 
-    public static void main(String[] args) {
-        long start = System.nanoTime();
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
-        fillData(taskManager);
-
-        long finish = System.nanoTime();
-        System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
+    protected static void printTasks(TaskManager taskManager) {
+        for (Task task : taskManager.getTasks()) {
+            System.out.println(task);
+        }
+        for (Epic epic : taskManager.getEpics()) {
+            System.out.println(epic);
+        }
+        for (Subtask subtask : taskManager.getSubtasks()) {
+            System.out.println(subtask);
+        }
     }
 
     protected static void fillData(TaskManager taskManager) {
@@ -73,18 +75,6 @@ public class InMemoryTaskManager implements TaskManager {
         System.out.println("\nСписок задач и подзадач в порядке приоритета:");
         for (Task task : taskManager.getPrioritizedTasks()) {
             System.out.println(task);
-        }
-    }
-
-    protected static void printTasks(TaskManager taskManager) {
-        for (Task task : taskManager.getTasks()) {
-            System.out.println(task);
-        }
-        for (Epic epic : taskManager.getEpics()) {
-            System.out.println(epic);
-        }
-        for (Subtask subtask : taskManager.getSubtasks()) {
-            System.out.println(subtask);
         }
     }
 
@@ -398,4 +388,14 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return intersectionMap;
     }
+
+    /*    public static void main(String[] args) {
+            long start = System.nanoTime();
+            InMemoryTaskManager taskManager = new InMemoryTaskManager();
+
+            fillData(taskManager);
+
+            long finish = System.nanoTime();
+            System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
+        }*/
 }
