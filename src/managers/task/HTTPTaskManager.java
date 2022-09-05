@@ -14,11 +14,12 @@ import java.util.List;
 
 public class HTTPTaskManager extends FileBackedTasksManager {
     private final KVTaskClient client;
-    private String key = "1";
+    private String key;
 
     public HTTPTaskManager(String sourceName) throws IOException, InterruptedException {
         super(sourceName);
-        client = new KVTaskClient(this.sourceName);
+        this.key = "defaultKey";
+        this.client = new KVTaskClient(this.sourceName);
     }
 
     public HTTPTaskManager(String sourceName, String key) throws IOException, InterruptedException {

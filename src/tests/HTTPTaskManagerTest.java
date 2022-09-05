@@ -15,10 +15,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
+class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager> {
     private final KVServer server = new KVServer();
     private final String serverURL = "http://localhost:8078";
-    private final String key = "1";
+    private String key;
 
     HTTPTaskManagerTest() throws IOException {
     }
@@ -27,6 +27,7 @@ class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
     void setUp() throws IOException, InterruptedException {
         server.start();
         taskManager = new HTTPTaskManager(serverURL);
+        key = taskManager.getKey();
     }
 
     @AfterEach
@@ -45,7 +46,7 @@ class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
     void saveEmptyHistoryToServer() throws IOException, InterruptedException {
         addTasks();
 
-        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
         String content = restoredManager.getClient().load(key);
 
         final List<Task> tasks = restoredManager.getTasks();
@@ -69,7 +70,7 @@ class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
         int epicByDefaultId = taskManager.addEpic(epicByDefault);
         taskManager.getEpicById(epicByDefaultId);
 
-        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
         String content = restoredManager.getClient().load(key);
 
         final List<Task> tasks = restoredManager.getTasks();
@@ -91,7 +92,7 @@ class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
     void loadFromEmptyTasksFromServer() throws IOException, InterruptedException {
         taskManager.save();
 
-        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
         String content = restoredManager.getClient().load(key);
 
         final List<Task> tasks = restoredManager.getTasks();
@@ -115,7 +116,7 @@ class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
         int epicByDefaultId = taskManager.addEpic(epicByDefault);
         taskManager.getEpicById(epicByDefaultId);
 
-        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
         String content = restoredManager.getClient().load(key);
 
         final List<Task> tasks = restoredManager.getTasks();
@@ -137,7 +138,7 @@ class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager>  {
     void loadFromEmptyHistoryFromServer() throws IOException, InterruptedException {
         addTasks();
 
-        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, "1");
+        HTTPTaskManager restoredManager = HTTPTaskManager.loadFromServer(serverURL, key);
         String content = restoredManager.getClient().load(key);
 
         final List<Task> tasks = restoredManager.getTasks();
