@@ -161,30 +161,40 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task task) {
         int id = task.getId();
         if (!taskMap.containsKey(id)) {
-            return;
+            throw new IllegalArgumentException("Задача с id=" + task.getId() + " отсутствует, задача '" + task.getName() + "' не обновлена.");
         }
-        Task oldTask = taskMap.put(id, task);
-        treeSet.remove(oldTask);
-        treeSet.add(task);
+        Task oldTask = taskMap.get(id);
+        if (checkIntersectionWhenTaskUpdated(oldTask, task)) {
+            taskMap.put(id, task);
+            treeSet.remove(oldTask);
+            treeSet.add(task);
+        } else {
+            throw new IllegalArgumentException("Обнаружено пересечение задач, задача '" + task.getName() + "' не обновлена.");
+        }
     }
 
     @Override
     public void updateSubtask(Subtask subtask) {
         int id = subtask.getId();
         if (!subtaskMap.containsKey(id)) {
-            return;
+            throw new IllegalArgumentException("Подзадача с id=" + subtask.getId() + " отсутствует, подзадача '" + subtask.getName() + "' не обновлена.");
         }
-        Subtask oldSubtask = subtaskMap.put(id, subtask);
-        treeSet.remove(oldSubtask);
-        treeSet.add(subtask);
-        determineEpicFields(subtask.getEpicId());
+        Subtask oldSubtask = subtaskMap.get(id);
+        if (checkIntersectionWhenTaskUpdated(oldSubtask, subtask)) {
+            subtaskMap.put(id, subtask);
+            treeSet.remove(oldSubtask);
+            treeSet.add(subtask);
+            determineEpicFields(subtask.getEpicId());
+        } else {
+            throw new IllegalArgumentException("Обнаружено пересечение задач, задача '" + subtask.getName() + "' не обновлена.");
+        }
     }
 
     @Override
     public void updateEpic(Epic epic) {
         int id = epic.getId();
         if (!epicMap.containsKey(id)) {
-            return;
+            throw new IllegalArgumentException("Эпик с id=" + epic.getId() + " отсутствует, эпик '" + epic.getName() + "' не обновлён.");
         }
         epicMap.put(id, epic);
     }
@@ -320,14 +330,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    protected void determineEpicFields(int id) {
-        determineEpicSubtasksId(id);
-        determineEpicStatus(id);
-        determineEpicDuration(id);
-        determineEpicStartTime(id);
-        determineEpicEndTime(id);
-    }
-
     private void updateIntersectionWhenTaskDeleted(Task task) {
         LocalDateTime taskStart = task.getStartTime().minusMinutes(task.getStartTime().getMinute() % 15);
         LocalDateTime taskEnd = task.getEndTime();
@@ -335,6 +337,38 @@ public class InMemoryTaskManager implements TaskManager {
         for (LocalDateTime i = taskStart; i.isBefore(taskEnd); i = i.plusMinutes(15)) {
             intersectionMap.put(i, true);
         }
+    }
+
+    private boolean checkIntersectionWhenTaskUpdated(Task oldTask, Task task) {
+        if (task.getStartTime().isBefore(start) || task.getEndTime().isAfter(end)) {
+            throw new IllegalArgumentException("Время начала и завершения задач доступно только на 2022 год");
+        }
+
+        Map<LocalDateTime, Boolean> map = new HashMap<>(intersectionMap);
+        LocalDateTime oldTaskStart = task.getStartTime().minusMinutes(task.getStartTime().getMinute() % 15);
+        LocalDateTime oldTaskEnd = task.getEndTime();
+
+        for (LocalDateTime i = oldTaskStart; i.isBefore(oldTaskEnd); i = i.plusMinutes(15)) {
+            map.put(i, true);
+        }
+
+        LocalDateTime taskStart = task.getStartTime().minusMinutes(task.getStartTime().getMinute() % 15);
+        LocalDateTime taskEnd = task.getEndTime();
+
+        for (LocalDateTime i = taskStart; i.isBefore(taskEnd); i = i.plusMinutes(15)) {
+            if (!map.get(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected void determineEpicFields(int id) {
+        determineEpicSubtasksId(id);
+        determineEpicStatus(id);
+        determineEpicDuration(id);
+        determineEpicStartTime(id);
+        determineEpicEndTime(id);
     }
 
     private void determineEpicSubtasksId(int id) {
