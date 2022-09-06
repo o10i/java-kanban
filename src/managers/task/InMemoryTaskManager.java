@@ -1,6 +1,8 @@
 package managers.task;
 
 import managers.Managers;
+import managers.exceptions.IntersectionTaskException;
+import managers.exceptions.NoTaskException;
 import managers.history.HistoryManager;
 import tasks.Epic;
 import tasks.Subtask;
@@ -124,13 +126,12 @@ public class InMemoryTaskManager implements TaskManager {
     public int addTask(Task task) {
         if (checkIntersection(task)) {
             updateIntersectionWhenTaskAdded(task);
-            int id = ++idCounter;
-            task.setId(idCounter);
+            task.setId(++idCounter);
             taskMap.put(idCounter, task);
             prioritizedTasks.add(task);
-            return id;
+            return idCounter;
         } else {
-            throw new IllegalArgumentException("Обнаружено пересечение задач, задача '" + task.getName() + "' не добавлена.");
+            throw new IntersectionTaskException("Обнаружено пересечение задач, задача '" + task.getName() + "' не добавлена.");
         }
     }
 
@@ -138,30 +139,28 @@ public class InMemoryTaskManager implements TaskManager {
     public int addSubtask(Subtask subtask) {
         if (checkIntersection(subtask)) {
             updateIntersectionWhenTaskAdded(subtask);
-            int id = ++idCounter;
-            subtask.setId(idCounter);
+            subtask.setId(++idCounter);
             subtaskMap.put(idCounter, subtask);
             prioritizedTasks.add(subtask);
             determineEpicFields(subtask.getEpicId());
-            return id;
+            return idCounter;
         } else {
-            throw new IllegalArgumentException("Обнаружено пересечение задач, подзадача '" + subtask.getName() + "' не добавлена.");
+            throw new IntersectionTaskException("Обнаружено пересечение задач, подзадача '" + subtask.getName() + "' не добавлена.");
         }
     }
 
     @Override
     public int addEpic(Epic epic) {
-        int id = ++idCounter;
-        epic.setId(idCounter);
+        epic.setId(++idCounter);
         epicMap.put(idCounter, epic);
-        return id;
+        return idCounter;
     }
 
     @Override
     public void updateTask(Task task) {
         int id = task.getId();
         if (!taskMap.containsKey(id)) {
-            throw new IllegalArgumentException("Задача с id=" + task.getId() + " отсутствует, задача '" + task.getName() + "' не обновлена.");
+            throw new NoTaskException("Задача с id=" + task.getId() + " отсутствует, задача '" + task.getName() + "' не обновлена.");
         }
         Task oldTask = taskMap.get(id);
         if (checkIntersectionWhenTaskUpdated(oldTask, task)) {
@@ -169,7 +168,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.remove(oldTask);
             prioritizedTasks.add(task);
         } else {
-            throw new IllegalArgumentException("Обнаружено пересечение задач, задача '" + task.getName() + "' не обновлена.");
+            throw new IntersectionTaskException("Обнаружено пересечение задач, задача '" + task.getName() + "' не обновлена.");
         }
     }
 
@@ -177,7 +176,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubtask(Subtask subtask) {
         int id = subtask.getId();
         if (!subtaskMap.containsKey(id)) {
-            throw new IllegalArgumentException("Подзадача с id=" + subtask.getId() + " отсутствует, подзадача '" + subtask.getName() + "' не обновлена.");
+            throw new NoTaskException("Подзадача с id=" + subtask.getId() + " отсутствует, подзадача '" + subtask.getName() + "' не обновлена.");
         }
         Subtask oldSubtask = subtaskMap.get(id);
         if (checkIntersectionWhenTaskUpdated(oldSubtask, subtask)) {
@@ -186,7 +185,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.add(subtask);
             determineEpicFields(subtask.getEpicId());
         } else {
-            throw new IllegalArgumentException("Обнаружено пересечение задач, задача '" + subtask.getName() + "' не обновлена.");
+            throw new IntersectionTaskException("Обнаружено пересечение задач, задача '" + subtask.getName() + "' не обновлена.");
         }
     }
 
@@ -194,7 +193,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic epic) {
         int id = epic.getId();
         if (!epicMap.containsKey(id)) {
-            throw new IllegalArgumentException("Эпик с id=" + epic.getId() + " отсутствует, эпик '" + epic.getName() + "' не обновлён.");
+            throw new NoTaskException("Эпик с id=" + epic.getId() + " отсутствует, эпик '" + epic.getName() + "' не обновлён.");
         }
         epicMap.put(id, epic);
     }

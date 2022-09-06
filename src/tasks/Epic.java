@@ -7,19 +7,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static tasks.enums.Status.NEW;
 import static tasks.enums.Type.EPIC;
 
 public class Epic extends Task {
     private final List<Integer> subtasksId = new ArrayList<>();
 
     public Epic(String name, String description) {
-        super(name, description);
+        super(name, description, 0, null);
     }
 
     public Epic(int id, String name, String description) {
-        super(id, name, description);
+        super(id, name, NEW, description, 0, null);
     }
-
     public List<Integer> getSubtasksId() {
         return subtasksId;
     }

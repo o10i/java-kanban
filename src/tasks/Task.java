@@ -19,44 +19,28 @@ public class Task {
     protected LocalDateTime startTime;
     protected LocalDateTime endTime;
 
-    public Task(String name, String description) {
-        this.name = name;
-        this.description = description;
-        this.status = NEW;
-    }
-
     public Task(String name, String description, long duration, LocalDateTime startTime) {
         this.name = name;
         this.description = description;
         this.duration = Duration.ofMinutes(duration);
-        this.startTime = startTime.minusSeconds(startTime.getSecond()).minusNanos(startTime.getNano());
-        this.status = NEW;
-    }
-
-    public Task(String name, Status status, String description, long duration, LocalDateTime startTime) {
-        this.name = name;
-        this.status = status;
-        this.description = description;
-        this.duration = Duration.ofMinutes(duration);
-        this.startTime = startTime.minusSeconds(startTime.getSecond()).minusNanos(startTime.getNano());
-        this.endTime = this.startTime.plus(this.duration);
-    }
-
-    public Task(int id, String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
+        this.startTime = determineStartTime(startTime);
         this.status = NEW;
     }
 
     public Task(int id, String name, Status status, String description, long duration, LocalDateTime startTime) {
-        this.name = name;
-        this.description = description;
         this.id = id;
+        this.name = name;
         this.status = status;
+        this.description = description;
         this.duration = Duration.ofMinutes(duration);
-        this.startTime = startTime.minusSeconds(startTime.getSecond()).minusNanos(startTime.getNano());
-        this.endTime = this.startTime.plus(this.duration);
+        this.startTime = determineStartTime(startTime);
+    }
+
+    private static LocalDateTime determineStartTime(LocalDateTime startTime) {
+        if (startTime == null) {
+            return null;
+        }
+        return startTime.minusSeconds(startTime.getSecond()).minusNanos(startTime.getNano());
     }
 
     public int getId() {
@@ -92,10 +76,7 @@ public class Task {
     }
 
     public Duration getDuration() {
-        if (duration != null) {
-            return duration;
-        }
-        return Duration.ZERO;
+        return duration;
     }
 
     public void setDuration(long duration) {
@@ -128,7 +109,12 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id && Objects.equals(name, task.name) && status == task.status && Objects.equals(description, task.description) && Objects.equals(duration, task.duration) && Objects.equals(startTime, task.startTime);
+        return id == task.id
+                && Objects.equals(name, task.name)
+                && status == task.status
+                && Objects.equals(description, task.description)
+                && Objects.equals(duration, task.duration)
+                && Objects.equals(startTime, task.startTime);
     }
 
     @Override
