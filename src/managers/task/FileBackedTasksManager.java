@@ -192,12 +192,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             } else if (task instanceof Subtask) {
                 Subtask subtask = (Subtask) task;
                 subtaskMap.put(id, subtask);
-                treeSet.add(subtask);
+                prioritizedTasks.add(subtask);
                 updateIntersectionWhenTaskAdded(subtask);
                 determineEpicFields(subtask.getEpicId());
             } else {
                 taskMap.put(id, task);
-                treeSet.add(task);
+                prioritizedTasks.add(task);
                 updateIntersectionWhenTaskAdded(task);
             }
         }
