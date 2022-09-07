@@ -30,6 +30,7 @@ public class HttpTaskServer {
         this.taskManager = taskManager;
 
         gson = new Gson();
+
         server = HttpServer.create(new InetSocketAddress(PORT), 0);
         server.createContext("/tasks", this::handleTasks);
     }

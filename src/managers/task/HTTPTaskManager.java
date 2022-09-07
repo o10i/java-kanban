@@ -17,9 +17,7 @@ public class HTTPTaskManager extends FileBackedTasksManager {
     private String key;
 
     public HTTPTaskManager(String sourceName) throws IOException, InterruptedException {
-        super(sourceName);
-        this.key = "defaultKey";
-        this.client = new KVTaskClient(this.sourceName);
+        this(sourceName, "defaultKey");
     }
 
     public HTTPTaskManager(String sourceName, String key) throws IOException, InterruptedException {
