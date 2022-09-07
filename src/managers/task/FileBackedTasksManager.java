@@ -40,7 +40,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         this.sourceName = sourceName;
     }
 
-
     protected static String historyToString(HistoryManager manager) {
         List<Task> list = manager.getHistory();
         StringBuilder history = new StringBuilder();
