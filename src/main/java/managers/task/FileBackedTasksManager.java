@@ -60,27 +60,26 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTasksManager loadFromFile(File file) {
-        FileBackedTasksManager fbtm = new FileBackedTasksManager(file.getName());
-        String content;
         try {
-            content = Files.readString(Path.of(file.getPath()));
+            FileBackedTasksManager fbtm = new FileBackedTasksManager(file.getPath());
+            String content = Files.readString(Path.of(file.getPath()));
+            String[] tasksAndHistory = content.split("\n\n");
+            String[] tasks = tasksAndHistory[0].split("\n");
+            fbtm.restoreMaps(tasks);
+            fbtm.idCounter = fbtm.getAllTasksSortedById().stream().map(Task::getId).max(Integer::compareTo).orElse(0);
+            if (tasksAndHistory.length > 1) {
+                String history = tasksAndHistory[1];
+                fbtm.restoreHistory(history);
+            }
+            fbtm.save();
+            return fbtm;
         } catch (IOException e) {
             throw new ManagerSaveException(e);
         }
-        String[] tasksAndHistory = content.split("\n\n");
-        String[] tasks = tasksAndHistory[0].split("\n");
-        fbtm.restoreMaps(tasks);
-        fbtm.idCounter = fbtm.getAllTasksSortedById().stream().map(Task::getId).max(Integer::compareTo).orElse(0);
-        if (tasksAndHistory.length > 1) {
-            String history = tasksAndHistory[1];
-            fbtm.restoreHistory(history);
-        }
-        fbtm.save();
-        return fbtm;
+
     }
 
-/*
-    public static void main(String[] args) {
+/*    public static void main(String[] args) {
         long start = System.nanoTime();
         FileBackedTasksManager taskManager = new FileBackedTasksManager("src/main/resources/history.csv");
 
@@ -109,8 +108,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         long finish = System.nanoTime();
         System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
-    }
-*/
+    }*/
 
     @Override
     public Task getTaskById(Integer id) {
