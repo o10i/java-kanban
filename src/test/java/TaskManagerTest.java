@@ -1,5 +1,3 @@
-package tests;
-
 import managers.task.TaskManager;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
@@ -14,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static tasks.enums.Status.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
-    protected final String filename = "history.csv";
+    protected final String filename = "src/test/resources/history.csv";
     protected T taskManager;
     protected Task taskByDefault;
     protected Epic epicByDefault;

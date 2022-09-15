@@ -79,6 +79,39 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return fbtm;
     }
 
+/*
+    public static void main(String[] args) {
+        long start = System.nanoTime();
+        FileBackedTasksManager taskManager = new FileBackedTasksManager("src/main/resources/history.csv");
+
+        fillData(taskManager);
+
+        TaskManager fbtm = FileBackedTasksManager.loadFromFile(new File("src/main/resources/history.csv"));
+
+        System.out.println("\nВосстановленный менеджер равен сохранённому:");
+        System.out.println(fbtm.equals(taskManager));
+        System.out.println("\nСписок восстановленных задач:");
+        printTasks(fbtm);
+        System.out.println("\nВосстановленная история просмотров:");
+        for (Task task : fbtm.getHistory()) {
+            System.out.println(task);
+        }
+
+        System.out.println("\nСледующая задача будет создана с id=8");
+        Epic epic3 = new Epic("Epic3", "Epic3 description");
+        fbtm.addEpic(epic3);
+        System.out.println(fbtm.getEpicById(8));
+
+        System.out.println("\nСписок задач и подзадач в порядке приоритета:");
+        for (Task task : taskManager.getPrioritizedTasks()) {
+            System.out.println(task);
+        }
+
+        long finish = System.nanoTime();
+        System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
+    }
+*/
+
     @Override
     public Task getTaskById(Integer id) {
         Task task = super.getTaskById(id);
@@ -224,35 +257,4 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     protected List<Task> getAllTasksSortedById() {
         return Stream.concat(Stream.concat(taskMap.values().stream(), epicMap.values().stream()), subtaskMap.values().stream()).sorted(Comparator.comparingInt(Task::getId)).collect(Collectors.toList());
     }
-
-    /*    public static void main(String[] args) {
-            long start = System.nanoTime();
-            FileBackedTasksManager taskManager = new FileBackedTasksManager("history.csv");
-
-            fillData(taskManager);
-
-            TaskManager fbtm = FileBackedTasksManager.loadFromFile(new File("history.csv"));
-
-            System.out.println("\nВосстановленный менеджер равен сохранённому:");
-            System.out.println(fbtm.equals(taskManager));
-            System.out.println("\nСписок восстановленных задач:");
-            printTasks(fbtm);
-            System.out.println("\nВосстановленная история просмотров:");
-            for (Task task : fbtm.getHistory()) {
-                System.out.println(task);
-            }
-
-            System.out.println("\nСледующая задача будет создана с id=8");
-            Epic epic3 = new Epic("Epic3", "Epic3 description");
-            fbtm.addEpic(epic3);
-            System.out.println(fbtm.getEpicById(8));
-
-            System.out.println("\nСписок задач и подзадач в порядке приоритета:");
-            for (Task task : taskManager.getPrioritizedTasks()) {
-                System.out.println(task);
-            }
-
-            long finish = System.nanoTime();
-            System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
-        }*/
 }

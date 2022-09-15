@@ -1,5 +1,3 @@
-package tests;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import http.HttpTaskServer;
@@ -37,7 +35,7 @@ class HttpTaskServerTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        taskManager = new FileBackedTasksManager("history.csv");
+        taskManager = new FileBackedTasksManager("src/test/resources/history.csv");
         server = new HttpTaskServer(taskManager);
         client = HttpClient.newHttpClient();
         server.start();

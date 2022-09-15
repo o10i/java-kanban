@@ -1,5 +1,3 @@
-package tests;
-
 import http.KVServer;
 import managers.task.HTTPTaskManager;
 import org.junit.jupiter.api.AfterEach;
@@ -18,6 +16,7 @@ class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager> {
 
     HTTPTaskManagerTest() throws IOException {
     }
+
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {

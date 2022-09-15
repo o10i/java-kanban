@@ -80,6 +80,18 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+/*
+    public static void main(String[] args) {
+        long start = System.nanoTime();
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
+
+        fillData(taskManager);
+
+        long finish = System.nanoTime();
+        System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
+    }
+*/
+
     @Override
     public Task getTaskById(Integer id) {
         if (taskMap.containsKey(id)) {
@@ -420,14 +432,4 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return intersectionMap;
     }
-
-    /*    public static void main(String[] args) {
-            long start = System.nanoTime();
-            InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
-            fillData(taskManager);
-
-            long finish = System.nanoTime();
-            System.out.println("\nМетод 'main' выполнен за " + (finish - start) / 1000000 + " миллисекунд");
-        }*/
 }

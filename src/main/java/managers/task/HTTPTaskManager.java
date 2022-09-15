@@ -34,7 +34,7 @@ public class HTTPTaskManager extends FileBackedTasksManager {
 
         fillData(taskManager);
 
-        TaskManager htm = HTTPTaskManager.loadFromServer("http://localhost:8078", "1");
+        TaskManager htm = HTTPTaskManager.loadFromServer("http://localhost:8078", "defaultKey");
 
         System.out.println("\nВосстановленный менеджер равен сохранённому:");
         System.out.println(htm.equals(taskManager));

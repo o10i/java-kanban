@@ -1,5 +1,3 @@
-package tests;
-
 import managers.task.FileBackedTasksManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

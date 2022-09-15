@@ -1,5 +1,3 @@
-package tests;
-
 import managers.history.InMemoryHistoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +20,7 @@ class InMemoryHistoryManagerTest {
     void setUp() {
         historyManager = new InMemoryHistoryManager();
     }
+
     private void addTasks() {
         taskByDefault = new Task("Test task", "Test task description", 20, LocalDateTime.now());
         taskByDefault.setId(1);
