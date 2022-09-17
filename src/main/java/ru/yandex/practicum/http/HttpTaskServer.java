@@ -32,7 +32,7 @@ public class HttpTaskServer {
         gson = new Gson();
 
         server = HttpServer.create(new InetSocketAddress(PORT), 0);
-        server.createContext("/ru/yandex/practicum/tasks", this::handleTasks);
+        server.createContext("/tasks", this::handleTasks);
     }
 
     public static void main(String[] args) throws IOException {
